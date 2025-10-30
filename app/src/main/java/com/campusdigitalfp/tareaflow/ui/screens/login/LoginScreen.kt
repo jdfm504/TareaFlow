@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.sp
 
 // Pantalla de login para la aplicación
 @Composable
-fun LoginScreen() {
+fun LoginScreen(onLoginSuccess: () -> Unit = {}) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -36,7 +36,7 @@ fun LoginScreen() {
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(100.dp))
 
             OutlinedTextField(
                 value = email,
@@ -60,7 +60,7 @@ fun LoginScreen() {
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = { /* TODO: Lógica de inicio de sesión */ },
+                onClick = { onLoginSuccess() }, // navegará al Home
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Iniciar sesión")
@@ -68,7 +68,7 @@ fun LoginScreen() {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            TextButton(onClick = { /* TODO: Ir a pantalla de registro */ }) {
+            TextButton(onClick = { /* TODO: Ir a registro */ }) {
                 Text("¿No tienes cuenta? Regístrate")
             }
         }

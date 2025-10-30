@@ -2,10 +2,15 @@ package com.campusdigitalfp.tareaflow.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+// Colores principales de TareaFlow
+val BluePrimary = Color(0xFF22A46E)
+val BlueSecondary = Color(0xFF7CA6AD)
+val BlueTertiary = Color(0xFFEA80A5)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+// Colores de fondo y superficie
+val LightBackground = Color(0xD3EDEFEF)
+val LightSurface = Color(0xFF0E22A1)
+
+// Texto
+val OnPrimaryText = Color.White
+val OnBackgroundText = Color(0xFF1C1B1F)
