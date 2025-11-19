@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.campusdigitalfp.tareaflow.ui.screens.home.HomeScreen
 import com.campusdigitalfp.tareaflow.ui.screens.login.LoginScreen
+import com.campusdigitalfp.tareaflow.ui.screens.register.RegisterScreen
 
 @Composable
 fun TareaFlowNavHost() {
@@ -22,6 +23,21 @@ fun TareaFlowNavHost() {
                     navController.navigate("home") {
                         popUpTo("login") { inclusive = true }
                     }
+                },
+                onGoToRegister = {
+                    navController.navigate("register")
+                }
+            )
+        }
+        composable("register") {
+            RegisterScreen(
+                onRegisterSuccess = {
+                    navController.navigate("home") {
+                        popUpTo("register") { inclusive = true }
+                    }
+                },
+                onGoToLogin = {
+                    navController.popBackStack() // vuelve al login
                 }
             )
         }

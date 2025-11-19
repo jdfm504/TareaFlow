@@ -1,22 +1,22 @@
-package com.campusdigitalfp.tareaflow.ui.screens.login
+package com.campusdigitalfp.tareaflow.ui.screens.register
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// Pantalla de login para la aplicación
 @Composable
-fun LoginScreen(
-    onLoginSuccess: () -> Unit = {},
-    onGoToRegister: () -> Unit = {}
+fun RegisterScreen(
+    onRegisterSuccess: () -> Unit = {},
+    onGoToLogin: () -> Unit = {}
 ) {
+    var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -32,14 +32,24 @@ fun LoginScreen(
                 .padding(32.dp)
         ) {
             Text(
-                text = "TareaFlow",
-                fontSize = 32.sp,
+                text = "Crear cuenta",
+                fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(100.dp))
+            Spacer(modifier = Modifier.height(32.dp))
+
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text("Nombre completo") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = email,
@@ -63,20 +73,17 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = { onLoginSuccess() }, // navegará al Home
+                onClick = { onRegisterSuccess() },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Iniciar sesión")
+                Text("Registrarse")
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            TextButton(onClick = { onGoToRegister() }) {
-                Text("¿No tienes cuenta? Regístrate")
+            TextButton(onClick = { onGoToLogin() }) {
+                Text("¿Ya tienes cuenta? Inicia sesión")
             }
         }
     }
 }
-
-
-
