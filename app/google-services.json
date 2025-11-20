@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "715113560516",
+    "project_id": "tareaflowv2",
+    "storage_bucket": "tareaflowv2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:715113560516:android:a4966062956883386e8c91",
+        "android_client_info": {
+          "package_name": "com.campusdigitalfp.tareaflow"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWtDospXfqPhAHEKbTnSHTnJ4oXOBOtvw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

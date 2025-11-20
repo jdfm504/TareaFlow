@@ -1,6 +1,7 @@
 package com.campusdigitalfp.tareaflow.ui.screens.login
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -8,14 +9,16 @@ import androidx.navigation.compose.rememberNavController
 import com.campusdigitalfp.tareaflow.ui.screens.home.HomeScreen
 import com.campusdigitalfp.tareaflow.ui.screens.login.LoginScreen
 import com.campusdigitalfp.tareaflow.ui.screens.register.RegisterScreen
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun TareaFlowNavHost() {
-    val navController: NavHostController = rememberNavController()
+fun TareaFlowNavHost(navController: NavHostController) {
+    val auth = FirebaseAuth.getInstance()
+    val startDestination = if (auth.currentUser == null) "login" else "home"
 
     NavHost(
         navController = navController,
-        startDestination = "login"
+        startDestination = startDestination
     ) {
         composable("login") {
             LoginScreen(
@@ -37,12 +40,12 @@ fun TareaFlowNavHost() {
                     }
                 },
                 onGoToLogin = {
-                    navController.popBackStack() // vuelve al login
+                    navController.popBackStack()
                 }
             )
         }
         composable("home") {
-            HomeScreen()
+            HomeScreen(navController, viewModel())
         }
     }
 }
