@@ -45,7 +45,7 @@ fun HomeScreen(
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFD32F2F), // rojo suave
+                    containerColor = Color(0xFFD32F2F),
                     contentColor = Color.White
                 ),
                 modifier = Modifier

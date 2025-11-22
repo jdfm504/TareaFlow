@@ -1,5 +1,6 @@
 package com.campusdigitalfp.tareaflow.ui.screens.register
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -8,6 +9,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -25,13 +29,35 @@ fun RegisterScreen(
 ) {
     val viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
     val uiState by viewModel.state.collectAsState()
+
+    val context = LocalContext.current
+
+    LaunchedEffect(uiState) {
+        when (uiState) {
+            is AuthUiState.Success -> {
+                Toast.makeText(context, "Registro correcto", Toast.LENGTH_SHORT).show()
+                onRegisterSuccess()
+            }
+            is AuthUiState.Error -> {
+                Toast.makeText(context, (uiState as AuthUiState.Error).message, Toast.LENGTH_SHORT).show()
+            }
+            else -> {}
+        }
+    }
+
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+
     var nameError by remember { mutableStateOf<String?>(null) }
     var emailError by remember { mutableStateOf<String?>(null) }
     var passwordError by remember { mutableStateOf<String?>(null) }
+    var confirmPasswordError by remember { mutableStateOf<String?>(null) }
 
+    val isLoading = uiState is AuthUiState.Loading
+
+    // Validaciones básicas
     fun validate(): Boolean {
         var isValid = true
         val emailPattern = Pattern.compile(
@@ -42,12 +68,13 @@ fun RegisterScreen(
                     "(?=.*[A-Z])" +                       // al menos una mayúscula
                     "(?=.*\\d)" +                         // al menos un número
                     "(?=.*[@\$!%*?&.,;:#^(){}\\[\\]_\\-+=~`|<>\\\\'\"/])" +  // al menos un carácter especial
-                    "[A-Za-z\\d@\$!%*?&.,;:#^(){}\\[\\]_\\-+=~`|<>\\\\'\"/]{6,}$" // caracteres permitidos (mínimo 6)
+                    "[A-Za-z\\d@\$!%*?&.,;:#^(){}\\[\\]_\\-+=~`|<>\\\\'\"/]{6,}$" // mínimo 6 caracteres
         )
 
         nameError = null
         emailError = null
         passwordError = null
+        confirmPasswordError = null
 
         if (name.isBlank()) {
             nameError = "Introduce tu nombre"
@@ -71,9 +98,18 @@ fun RegisterScreen(
             isValid = false
         }
 
+        if (confirmPassword.isBlank()) {
+            confirmPasswordError = "Repite la contraseña"
+            isValid = false
+        } else if (password != confirmPassword) {
+            confirmPasswordError = "Las contraseñas no coinciden"
+            isValid = false
+        }
+
         return isValid
     }
 
+    // UI de la pantalla
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -95,6 +131,7 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            // Campo Nombre
             OutlinedTextField(
                 value = name,
                 onValueChange = {
@@ -106,9 +143,9 @@ fun RegisterScreen(
                 isError = nameError != null,
                 modifier = Modifier.fillMaxWidth()
             )
-            if (nameError != null) {
+            nameError?.let {
                 Text(
-                    text = nameError!!,
+                    text = it,
                     color = MaterialTheme.colorScheme.error,
                     fontSize = 12.sp,
                     modifier = Modifier.align(Alignment.Start)
@@ -117,6 +154,7 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Campo Email
             OutlinedTextField(
                 value = email,
                 onValueChange = {
@@ -128,9 +166,9 @@ fun RegisterScreen(
                 isError = emailError != null,
                 modifier = Modifier.fillMaxWidth()
             )
-            if (emailError != null) {
+            emailError?.let {
                 Text(
-                    text = emailError!!,
+                    text = it,
                     color = MaterialTheme.colorScheme.error,
                     fontSize = 12.sp,
                     modifier = Modifier.align(Alignment.Start)
@@ -139,28 +177,64 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Campo Contraseña
             var passwordVisible by remember { mutableStateOf(false) }
 
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = {
+                    password = it
+                    passwordError = null
+                },
                 label = { Text("Contraseña") },
                 singleLine = true,
+                isError = passwordError != null,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
                     val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
                     val description = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
-
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(imageVector = image, contentDescription = description)
                     }
                 }
             )
-
-            if (passwordError != null) {
+            passwordError?.let {
                 Text(
-                    text = passwordError!!,
+                    text = it,
+                    color = MaterialTheme.colorScheme.error,
+                    fontSize = 12.sp,
+                    modifier = Modifier.align(Alignment.Start)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Campo Confirmar contraseña
+            var confirmVisible by remember { mutableStateOf(false) }
+
+            OutlinedTextField(
+                value = confirmPassword,
+                onValueChange = {
+                    confirmPassword = it
+                    confirmPasswordError = null
+                },
+                label = { Text("Confirmar contraseña") },
+                singleLine = true,
+                isError = confirmPasswordError != null,
+                visualTransformation = if (confirmVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    val image = if (confirmVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                    val description = if (confirmVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                    IconButton(onClick = { confirmVisible = !confirmVisible }) {
+                        Icon(imageVector = image, contentDescription = description)
+                    }
+                }
+            )
+            confirmPasswordError?.let {
+                Text(
+                    text = it,
                     color = MaterialTheme.colorScheme.error,
                     fontSize = 12.sp,
                     modifier = Modifier.align(Alignment.Start)
@@ -169,18 +243,36 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Botón de registro
             Button(
                 onClick = {
                     if (validate()) {
                         viewModel.register(email, password) { onRegisterSuccess() }
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                enabled = !isLoading, // desactiva cuando está cargando
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .alpha(if (isLoading) 0.6f else 1f) // efecto visual de desactivado
             ) {
-                Text("Registrarse")
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        strokeWidth = 2.dp,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .padding(end = 8.dp)
+                    )
+                }
+                Text(if (isLoading) "Registrando..." else "Registrarse")
             }
+
             when (uiState) {
-                is AuthUiState.Loading -> LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
+                is AuthUiState.Loading -> LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)
+                )
                 is AuthUiState.Error -> Text(
                     (uiState as AuthUiState.Error).message,
                     color = MaterialTheme.colorScheme.error,
