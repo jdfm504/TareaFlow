@@ -55,6 +55,8 @@ dependencies {
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
     implementation("com.google.firebase:firebase-auth")
+    //Iconos
+    implementation("androidx.compose.material:material-icons-extended")
 
     testImplementation(libs.junit)
 
