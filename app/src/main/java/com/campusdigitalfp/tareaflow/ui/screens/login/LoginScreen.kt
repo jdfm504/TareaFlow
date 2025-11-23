@@ -8,6 +8,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +32,7 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var emailError by remember { mutableStateOf<String?>(null) }
     var passwordError by remember { mutableStateOf<String?>(null) }
+    val isLoading = uiState is AuthUiState.Loading
 
     fun validate(): Boolean {
         var isValid = true
@@ -137,9 +140,21 @@ fun LoginScreen(
                         viewModel.login(email, password) { onLoginSuccess() }
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                enabled = !isLoading, // desactiva cuando está cargando
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .alpha(if (isLoading) 0.6f else 1f) // efecto visual de desactivado
             ) {
-                Text("Iniciar sesión")
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        strokeWidth = 2.dp,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .padding(end = 8.dp)
+                    )
+                }
+                Text(if (isLoading) "Iniciando sesión..." else "Iniciar sesión")
             }
 
             // Debajo, muestra feedback:
@@ -161,4 +176,3 @@ fun LoginScreen(
         }
     }
 }
-
