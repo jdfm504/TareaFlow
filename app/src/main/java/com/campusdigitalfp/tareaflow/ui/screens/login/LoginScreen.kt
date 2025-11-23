@@ -1,5 +1,6 @@
 package com.campusdigitalfp.tareaflow.ui.screens.login
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -10,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
@@ -155,6 +157,23 @@ fun LoginScreen(
                     )
                 }
                 Text(if (isLoading) "Iniciando sesión..." else "Iniciar sesión")
+            }
+
+            val context = LocalContext.current
+
+            LaunchedEffect(uiState) {
+                when (uiState) {
+                    is AuthUiState.Success -> {
+                        Toast.makeText(context, "Inicio de sesión correcto ✅", Toast.LENGTH_SHORT).show()
+                        onLoginSuccess()
+                    }
+
+                    is AuthUiState.Error -> {
+                        Toast.makeText(context, (uiState as AuthUiState.Error).message, Toast.LENGTH_SHORT).show()
+                    }
+
+                    else -> {}
+                }
             }
 
             // Debajo, muestra feedback:

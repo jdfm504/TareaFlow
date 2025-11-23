@@ -1,5 +1,6 @@
 package com.campusdigitalfp.tareaflow.ui.screens.home
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
@@ -8,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -18,6 +20,7 @@ fun HomeScreen(
     navController: NavController,
     viewModel: AuthViewModel = viewModel()
 ) {
+    val context = LocalContext.current
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -40,6 +43,7 @@ fun HomeScreen(
             Button(
                 onClick = {
                     viewModel.logout()
+                    Toast.makeText(context, "Sesión cerrada correctamente 👋", Toast.LENGTH_SHORT).show()
                     navController.navigate("login") {
                         popUpTo("home") { inclusive = true }
                     }
