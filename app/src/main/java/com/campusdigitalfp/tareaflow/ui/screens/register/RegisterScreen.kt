@@ -1,5 +1,6 @@
 package com.campusdigitalfp.tareaflow.ui.screens.register
 
+import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -12,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -21,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.campusdigitalfp.tareaflow.viewmodel.AuthUiState
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import java.util.regex.Pattern
+import com.campusdigitalfp.tareaflow.R
 
 @Composable
 fun RegisterScreen(
@@ -35,12 +38,19 @@ fun RegisterScreen(
     LaunchedEffect(uiState) {
         when (uiState) {
             is AuthUiState.Success -> {
-                Toast.makeText(context, "Registro correcto", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.register_success),
+                    Toast.LENGTH_SHORT
+                ).show()
                 onRegisterSuccess()
             }
+
             is AuthUiState.Error -> {
-                Toast.makeText(context, (uiState as AuthUiState.Error).message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, (uiState as AuthUiState.Error).message, Toast.LENGTH_SHORT)
+                    .show()
             }
+
             else -> {}
         }
     }
@@ -60,9 +70,7 @@ fun RegisterScreen(
     // Validaciones básicas
     fun validate(): Boolean {
         var isValid = true
-        val emailPattern = Pattern.compile(
-            "^[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\\.)+[A-Za-z]{2,}$"
-        )
+        val emailPattern = Patterns.EMAIL_ADDRESS
         val passwordPattern = Pattern.compile(
             "^(?=.*[a-z])" +                       // al menos una minúscula
                     "(?=.*[A-Z])" +                       // al menos una mayúscula
@@ -77,39 +85,38 @@ fun RegisterScreen(
         confirmPasswordError = null
 
         if (name.isBlank()) {
-            nameError = "Introduce tu nombre"
+            nameError = context.getString(R.string.error_name_empty)
             isValid = false
         }
 
         if (email.isBlank()) {
-            emailError = "Introduce tu correo electrónico"
+            emailError = context.getString(R.string.error_email_empty)
             isValid = false
         } else if (!emailPattern.matcher(email).matches()) {
-            emailError = "Formato de correo no válido"
+            emailError = context.getString(R.string.error_email_format)
             isValid = false
         }
 
         if (password.isBlank()) {
-            passwordError = "Introduce una contraseña"
+            passwordError = context.getString(R.string.error_password_empty)
             isValid = false
         } else if (!passwordPattern.matcher(password).matches()) {
-            passwordError =
-                "Debe tener 6+ caracteres, incluir mayúscula, minúscula, número y símbolo"
+            passwordError = context.getString(R.string.error_password_format)
             isValid = false
         }
 
         if (confirmPassword.isBlank()) {
-            confirmPasswordError = "Repite la contraseña"
+            confirmPasswordError = context.getString(R.string.error_confirm_empty)
             isValid = false
         } else if (password != confirmPassword) {
-            confirmPasswordError = "Las contraseñas no coinciden"
+            confirmPasswordError = context.getString(R.string.error_confirm_mismatch)
             isValid = false
         }
 
         return isValid
     }
 
-    // UI de la pantalla
+    // Ui de la pantalla
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -122,7 +129,7 @@ fun RegisterScreen(
                 .padding(32.dp)
         ) {
             Text(
-                text = "Crear cuenta",
+                text = stringResource(R.string.register_title),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -138,7 +145,7 @@ fun RegisterScreen(
                     name = it
                     nameError = null
                 },
-                label = { Text("Nombre completo") },
+                label = { Text(stringResource(R.string.register_name_label)) },
                 singleLine = true,
                 isError = nameError != null,
                 modifier = Modifier.fillMaxWidth()
@@ -161,7 +168,7 @@ fun RegisterScreen(
                     email = it
                     emailError = null
                 },
-                label = { Text("Correo electrónico") },
+                label = { Text(stringResource(R.string.register_email_label)) },
                 singleLine = true,
                 isError = emailError != null,
                 modifier = Modifier.fillMaxWidth()
@@ -186,14 +193,18 @@ fun RegisterScreen(
                     password = it
                     passwordError = null
                 },
-                label = { Text("Contraseña") },
+                label = { Text(stringResource(R.string.register_password_label)) },
                 singleLine = true,
                 isError = passwordError != null,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
-                    val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                    val description = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                    val image =
+                        if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                    val description = if (passwordVisible)
+                        stringResource(R.string.hide_password)
+                    else
+                        stringResource(R.string.show_password)
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(imageVector = image, contentDescription = description)
                     }
@@ -219,14 +230,19 @@ fun RegisterScreen(
                     confirmPassword = it
                     confirmPasswordError = null
                 },
-                label = { Text("Confirmar contraseña") },
+                label = { Text(stringResource(R.string.register_confirm_password_label)) },
                 singleLine = true,
                 isError = confirmPasswordError != null,
                 visualTransformation = if (confirmVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
-                    val image = if (confirmVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                    val description = if (confirmVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                    val image =
+                        if (confirmVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                    val description =
+                        if (confirmVisible)
+                            stringResource(R.string.hide_password)
+                        else
+                            stringResource(R.string.show_password)
                     IconButton(onClick = { confirmVisible = !confirmVisible }) {
                         Icon(imageVector = image, contentDescription = description)
                     }
@@ -264,7 +280,11 @@ fun RegisterScreen(
                             .padding(end = 8.dp)
                     )
                 }
-                Text(if (isLoading) "Registrando..." else "Registrarse")
+                Text(if (isLoading)
+                    stringResource(R.string.register_loading)
+                else
+                    stringResource(R.string.register_button)
+                )
             }
 
             when (uiState) {
@@ -273,18 +293,20 @@ fun RegisterScreen(
                         .fillMaxWidth()
                         .padding(top = 8.dp)
                 )
+
                 is AuthUiState.Error -> Text(
                     (uiState as AuthUiState.Error).message,
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(top = 8.dp)
                 )
+
                 is AuthUiState.Success, AuthUiState.Idle -> {}
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
             TextButton(onClick = { onGoToLogin() }) {
-                Text("¿Ya tienes cuenta? Inicia sesión")
+                Text(stringResource(R.string.register_to_login_link))
             }
         }
     }

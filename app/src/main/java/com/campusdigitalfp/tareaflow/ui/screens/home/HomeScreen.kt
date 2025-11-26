@@ -10,10 +10,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
+import com.campusdigitalfp.tareaflow.R
 
 @Composable
 fun HomeScreen(
@@ -21,6 +23,7 @@ fun HomeScreen(
     viewModel: AuthViewModel = viewModel()
 ) {
     val context = LocalContext.current
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -33,7 +36,7 @@ fun HomeScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Bienvenido a TareaFlow 🌀",
+                text = stringResource(R.string.home_welcome),
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -43,7 +46,7 @@ fun HomeScreen(
             Button(
                 onClick = {
                     viewModel.logout()
-                    Toast.makeText(context, "Sesión cerrada correctamente 👋", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.logout_success), Toast.LENGTH_SHORT).show()
                     navController.navigate("login") {
                         popUpTo("home") { inclusive = true }
                     }
@@ -58,13 +61,15 @@ fun HomeScreen(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                    contentDescription = "Cerrar sesión",
+                    contentDescription = stringResource(R.string.logout_description),
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Cerrar sesión")
+                Text(stringResource(R.string.logout_button))
             }
 
         }
     }
 }
+
+

@@ -1,2 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="app_name">TareaFlow</string>
+    <string name="login_title">Sign in</string>
+    <string name="login_loading">Signing in...</string>
+    <string name="login_success">Login successful ✅</string>
+    <string name="register_link">Don\'t have an account? Sign up</string>
+
+    <string name="home_welcome">Welcome to TareaFlow 🌀</string>
+    <string name="logout_button">Log out</string>
+    <string name="logout_description">Log out</string>
+    <string name="logout_success">Session closed successfully 👋</string>
+
+    <string name="email_label">Email</string>
+    <string name="password_label">Password</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
+
+    <string name="login_button">Sign in</string>
+
+    <string name="register_title">Create account</string>
+    <string name="register_name_label">Full name</string>
+    <string name="register_email_label">Email</string>
+    <string name="register_password_label">Password</string>
+    <string name="register_confirm_password_label">Confirm password</string>
+    <string name="register_loading">Registering...</string>
+    <string name="register_button">Sign up</string>
+    <string name="register_success">Registration completed successfully 🎉</string>
+    <string name="register_to_login_link">Already have an account? Sign in</string>
+
+    <string name="error_name_empty">Enter your name</string>
+    <string name="error_email_empty">Enter your email</string>
+    <string name="error_email_format">Invalid email format</string>
+    <string name="error_password_empty">Enter a password</string>
+    <string name="error_password_format">Must have 6+ characters, include uppercase, lowercase, number and symbol</string>
+    <string name="error_confirm_empty">Repeat the password</string>
+    <string name="error_confirm_mismatch">Passwords do not match</string>
+    <string name="error_password_short">Password must be at least 6 characters long</string>
+
+</resources>

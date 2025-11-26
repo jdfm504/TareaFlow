@@ -1,3 +1,43 @@
 <resources>
+    <!-- App y títulos -->
     <string name="app_name">TareaFlow</string>
+    <string name="login_title">Iniciar sesión</string>
+    <string name="login_loading">Iniciando sesión...</string>
+    <string name="login_success">Inicio de sesión correcto ✅</string>
+    <string name="register_link">¿No tienes cuenta? Regístrate</string>
+    <!-- HomeScreen -->
+    <string name="home_welcome">Bienvenido a TareaFlow 🌀</string>
+    <string name="logout_button">Cerrar sesión</string>
+    <string name="logout_description">Cerrar sesión</string>
+    <string name="logout_success">Sesión cerrada correctamente 👋</string>
+
+    <!-- Campos -->
+    <string name="email_label">Correo electrónico</string>
+    <string name="password_label">Contraseña</string>
+    <string name="show_password">Mostrar contraseña</string>
+    <string name="hide_password">Ocultar contraseña</string>
+
+    <!-- Botones -->
+    <string name="login_button">Iniciar sesión</string>
+
+    <!-- Register Screen -->
+    <string name="register_title">Crear cuenta</string>
+    <string name="register_name_label">Nombre completo</string>
+    <string name="register_email_label">Correo electrónico</string>
+    <string name="register_password_label">Contraseña</string>
+    <string name="register_confirm_password_label">Confirmar contraseña</string>
+    <string name="register_loading">Registrando...</string>
+    <string name="register_button">Registrarse</string>
+    <string name="register_success">Registro completado con éxito 🎉</string>
+    <string name="register_to_login_link">¿Ya tienes cuenta? Inicia sesión</string>
+
+    <!-- Validaciones -->
+    <string name="error_name_empty">Introduce tu nombre</string>
+    <string name="error_email_empty">Introduce tu correo electrónico</string>
+    <string name="error_email_format">Formato de correo no válido</string>
+    <string name="error_password_empty">Introduce una contraseña</string>
+    <string name="error_password_format">Debe tener 6+ caracteres, incluir mayúscula, minúscula, número y símbolo</string>
+    <string name="error_confirm_empty">Repite la contraseña</string>
+    <string name="error_confirm_mismatch">Las contraseñas no coinciden</string>
+    <string name="error_password_short">La contraseña debe tener al menos 6 caracteres</string>
 </resources>

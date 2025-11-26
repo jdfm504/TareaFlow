@@ -1,5 +1,6 @@
 package com.campusdigitalfp.tareaflow.ui.screens.login
 
+import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -12,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
@@ -21,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.campusdigitalfp.tareaflow.viewmodel.AuthUiState
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import java.util.regex.Pattern
+import com.campusdigitalfp.tareaflow.R
 
 // Pantalla de login para la aplicación
 @Composable
@@ -35,28 +38,28 @@ fun LoginScreen(
     var emailError by remember { mutableStateOf<String?>(null) }
     var passwordError by remember { mutableStateOf<String?>(null) }
     val isLoading = uiState is AuthUiState.Loading
+    val context = LocalContext.current
 
     fun validate(): Boolean {
         var isValid = true
-        val emailPattern = Pattern.compile(
-            "^[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\\.)+[A-Za-z]{2,}$"
-        )
+        val emailPattern = Patterns.EMAIL_ADDRESS
+
         emailError = null
         passwordError = null
 
         if (email.isBlank()) {
-            emailError = "Introduce tu correo electrónico"
+            emailError = context.getString(R.string.error_email_empty)
             isValid = false
         } else if (!emailPattern.matcher(email).matches()) {
-            emailError = "Formato de correo no válido"
+            emailError = context.getString(R.string.error_email_format)
             isValid = false
         }
 
         if (password.isBlank()) {
-            passwordError = "Introduce tu contraseña"
+            passwordError = context.getString(R.string.error_password_empty)
             isValid = false
         } else if (password.length < 6) {
-            passwordError = "La contraseña debe tener al menos 6 caracteres"
+            passwordError = context.getString(R.string.error_password_short)
             isValid = false
         }
 
@@ -75,7 +78,7 @@ fun LoginScreen(
                 .padding(32.dp)
         ) {
             Text(
-                text = "TareaFlow",
+                text = stringResource(R.string.app_name),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -90,7 +93,7 @@ fun LoginScreen(
                     email = it
                     emailError = null
                 },
-                label = { Text("Correo electrónico") },
+                label = { Text(stringResource(R.string.email_label)) },
                 singleLine = true,
                 isError = emailError != null,
                 modifier = Modifier.fillMaxWidth()
@@ -111,13 +114,17 @@ fun LoginScreen(
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Contraseña") },
+                label = { Text(stringResource(R.string.password_label)) },
                 singleLine = true,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
-                    val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                    val description = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                    val image =
+                        if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                    val description = if (passwordVisible)
+                        stringResource(R.string.hide_password)
+                    else
+                        stringResource(R.string.show_password)
 
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(imageVector = image, contentDescription = description)
@@ -156,20 +163,28 @@ fun LoginScreen(
                             .padding(end = 8.dp)
                     )
                 }
-                Text(if (isLoading) "Iniciando sesión..." else "Iniciar sesión")
+                Text(
+                    if (isLoading)
+                        stringResource(R.string.login_loading)
+                    else
+                        stringResource(R.string.login_button)
+                )
             }
-
-            val context = LocalContext.current
 
             LaunchedEffect(uiState) {
                 when (uiState) {
                     is AuthUiState.Success -> {
-                        Toast.makeText(context, "Inicio de sesión correcto ✅", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.login_success), Toast.LENGTH_SHORT)
+                            .show()
                         onLoginSuccess()
                     }
 
                     is AuthUiState.Error -> {
-                        Toast.makeText(context, (uiState as AuthUiState.Error).message, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            (uiState as AuthUiState.Error).message,
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
 
                     else -> {}
@@ -178,19 +193,25 @@ fun LoginScreen(
 
             // Debajo, muestra feedback:
             when (uiState) {
-                is AuthUiState.Loading -> LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
+                is AuthUiState.Loading -> LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)
+                )
+
                 is AuthUiState.Error -> Text(
                     (uiState as AuthUiState.Error).message,
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(top = 8.dp)
                 )
+
                 is AuthUiState.Success, AuthUiState.Idle -> {}
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
             TextButton(onClick = { onGoToRegister() }) {
-                Text("¿No tienes cuenta? Regístrate")
+                Text(stringResource(R.string.register_link))
             }
         }
     }
