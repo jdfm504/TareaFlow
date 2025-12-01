@@ -130,7 +130,7 @@ fun RegisterScreen(
         ) {
             Text(
                 text = stringResource(R.string.register_title),
-                fontSize = 28.sp,
+                fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Center
@@ -257,7 +257,7 @@ fun RegisterScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(36.dp))
 
             // Botón de registro
             Button(
@@ -270,6 +270,7 @@ fun RegisterScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .alpha(if (isLoading) 0.6f else 1f) // efecto visual de desactivado
+                    .height(50.dp)
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
@@ -283,7 +284,10 @@ fun RegisterScreen(
                 Text(if (isLoading)
                     stringResource(R.string.register_loading)
                 else
-                    stringResource(R.string.register_button)
+                    stringResource(R.string.register_button),
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
                 )
             }
 
@@ -306,7 +310,11 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             TextButton(onClick = { onGoToLogin() }) {
-                Text(stringResource(R.string.register_to_login_link))
+                Text(stringResource
+                    (R.string.register_to_login_link),
+                    color = Color.hsl(123f, 0.40f, 0.45f),
+                    fontSize = 14.sp
+                )
             }
         }
     }

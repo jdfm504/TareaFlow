@@ -2,6 +2,7 @@ package com.campusdigitalfp.tareaflow.ui.screens.login
 
 import android.util.Patterns
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -13,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -31,6 +33,7 @@ fun LoginScreen(
     onLoginSuccess: () -> Unit = {},
     onGoToRegister: () -> Unit = {}
 ) {
+    // definición de variables
     val viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
     val uiState by viewModel.state.collectAsState()
     var email by remember { mutableStateOf("") }
@@ -40,6 +43,7 @@ fun LoginScreen(
     val isLoading = uiState is AuthUiState.Loading
     val context = LocalContext.current
 
+    // Validación de email y password
     fun validate(): Boolean {
         var isValid = true
         val emailPattern = Patterns.EMAIL_ADDRESS
@@ -66,6 +70,7 @@ fun LoginScreen(
         return isValid
     }
 
+    // Diseño de pantalla con surface
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -77,6 +82,16 @@ fun LoginScreen(
                 .fillMaxSize()
                 .padding(32.dp)
         ) {
+            // Logo
+            Image(
+                painter = painterResource(id = R.drawable.list),
+                contentDescription = "Logo de la app",
+                modifier = Modifier
+                    .size(50.dp) // Ajusta el tamaño del logo
+                    .padding(bottom = 20.dp)
+            )
+
+            // Nombre de la aplicación
             Text(
                 text = stringResource(R.string.app_name),
                 fontSize = 32.sp,
@@ -87,6 +102,7 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(40.dp))
 
+            // Campo de email
             OutlinedTextField(
                 value = email,
                 onValueChange = {
@@ -103,7 +119,7 @@ fun LoginScreen(
                     text = emailError!!,
                     color = MaterialTheme.colorScheme.error,
                     fontSize = 12.sp,
-                    modifier = Modifier.align(Alignment.Start)
+                    modifier = Modifier.align(Alignment.Start).padding(start = 16.dp)
                 )
             }
 
@@ -111,6 +127,7 @@ fun LoginScreen(
 
             var passwordVisible by remember { mutableStateOf(false) }
 
+            // Campo del password
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
@@ -137,12 +154,13 @@ fun LoginScreen(
                     text = passwordError!!,
                     color = MaterialTheme.colorScheme.error,
                     fontSize = 12.sp,
-                    modifier = Modifier.align(Alignment.Start)
+                    modifier = Modifier.align(Alignment.Start).padding(start = 16.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(50.dp))
 
+            // Botón para hacer login
             Button(
                 onClick = {
                     if (validate()) {
@@ -153,6 +171,7 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .alpha(if (isLoading) 0.6f else 1f) // efecto visual de desactivado
+                    .height(50.dp)
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
@@ -167,10 +186,14 @@ fun LoginScreen(
                     if (isLoading)
                         stringResource(R.string.login_loading)
                     else
-                        stringResource(R.string.login_button)
+                        stringResource(R.string.login_button),
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
                 )
             }
 
+            // Toast
             LaunchedEffect(uiState) {
                 when (uiState) {
                     is AuthUiState.Success -> {
@@ -191,7 +214,7 @@ fun LoginScreen(
                 }
             }
 
-            // Debajo, muestra feedback:
+            // Mostrar barra de carga
             when (uiState) {
                 is AuthUiState.Loading -> LinearProgressIndicator(
                     modifier = Modifier
@@ -208,10 +231,15 @@ fun LoginScreen(
                 is AuthUiState.Success, AuthUiState.Idle -> {}
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
+            // Botón para navegar a pantalla de registro
             TextButton(onClick = { onGoToRegister() }) {
-                Text(stringResource(R.string.register_link))
+                Text(stringResource
+                    (R.string.register_link),
+                    color = Color.hsl(123f, 0.40f, 0.45f),
+                    fontSize = 14.sp
+                )
             }
         }
     }
