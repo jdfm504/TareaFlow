@@ -50,12 +50,7 @@ class TaskViewModel : ViewModel() {
         clearSelection()
     }
 
-    // Semilla temporal para ver lista
-    //fun seed() {
-    //   if (_tasks.isEmpty()) {
-    //        addTask("Comprar pan", "Integral y sin sal")
-    //        addTask("Estudiar DAM", "Compose + Firestore")
-    //        addTask("Gimnasio", "Pierna + core")
-    //    }
-    // }
+    fun updateTask(task: Task) {
+        repository.updateTask(task)
+    }
 }

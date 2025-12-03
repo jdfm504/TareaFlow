@@ -11,6 +11,7 @@ import com.campusdigitalfp.tareaflow.ui.screens.home.HomeScreen
 import com.campusdigitalfp.tareaflow.ui.screens.login.LoginScreen
 import com.campusdigitalfp.tareaflow.ui.screens.register.RegisterScreen
 import com.google.firebase.auth.FirebaseAuth
+import com.campusdigitalfp.tareaflow.ui.screens.home.TaskEditScreen
 
 @Composable
 fun TareaFlowNavHost(navController: NavHostController) {
@@ -49,6 +50,13 @@ fun TareaFlowNavHost(navController: NavHostController) {
             ProtectedRoute(navController) {
                 HomeScreen(navController)
             }
+        }
+        composable("task/new") {
+            TaskEditScreen(navController = navController)
+        }
+        composable("task/{taskId}") { backStackEntry ->
+            val taskId = backStackEntry.arguments?.getString("taskId")
+            TaskEditScreen(navController = navController, taskId = taskId)
         }
     }
 }

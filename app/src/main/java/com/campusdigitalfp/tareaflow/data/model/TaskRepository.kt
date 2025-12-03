@@ -12,7 +12,7 @@ class TaskRepository {
     private val db = FirebaseFirestore.getInstance()
     private val tasksCollection = db.collection("tareas")
 
-    // 🔹 Escuchar tareas en tiempo real
+    // Escuchar tareas en tiempo real
     fun listenToTasks(): Flow<List<Task>> = callbackFlow {
         val listener: ListenerRegistration = tasksCollection
             .addSnapshotListener { snapshot, error ->
@@ -28,15 +28,22 @@ class TaskRepository {
         awaitClose { listener.remove() }
     }
 
-    // 🔹 Agregar una nueva tarea
+    // Agregar una nueva tarea
     fun addTask(task: Task) {
-        val id = if (task.id.isBlank()) null else task.id
-        val doc = if (id != null) tasksCollection.document(id) else tasksCollection.document()
-        doc.set(task)
+        val doc = tasksCollection.document()         // crea el doc con ID generado
+        val taskWithId = task.copy(id = doc.id)      // copia el ID dentro del objeto
+        doc.set(taskWithId)                          // guarda el objeto con su id dentro
     }
 
-    // 🔹 Eliminar una tarea
+    // Eliminar una tarea
     fun deleteTask(taskId: String) {
         tasksCollection.document(taskId).delete()
+    }
+
+    // Editar una tarea
+    fun updateTask(task: Task) {
+        if (task.id.isNotBlank()) {
+            tasksCollection.document(task.id).set(task)
+        }
     }
 }

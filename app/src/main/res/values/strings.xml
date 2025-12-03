@@ -5,11 +5,19 @@
     <string name="login_loading">Iniciando sesión...</string>
     <string name="login_success">Inicio de sesión correcto ✅</string>
     <string name="register_link">¿No tienes cuenta? Regístrate</string>
+
     <!-- HomeScreen -->
-    <string name="home_welcome">Bienvenido a TareaFlow 🌀</string>
-    <string name="logout_button">Cerrar sesión</string>
-    <string name="logout_description">Cerrar sesión</string>
+    <string name="home_title">TareaFlow</string>
+    <string name="menu_cd">Menú</string>
+    <string name="menu_add_task">Agregar tarea</string>
+    <string name="menu_delete_selected">Eliminar seleccionadas</string>
+    <string name="menu_settings">Configuración</string>
+    <string name="menu_about">Acerca de</string>
+    <string name="fab_add_cd">Agregar</string>
+    <string name="menu_logout">Cerrar sesión</string>
     <string name="logout_success">Sesión cerrada correctamente 👋</string>
+    <string name="selection_mode_title">%1$d seleccionadas</string>
+    <string name="cancel_selection_cd">Cancelar selección</string>
 
     <!-- Campos -->
     <string name="email_label">Correo electrónico</string>
@@ -40,4 +48,13 @@
     <string name="error_confirm_empty">Repite la contraseña</string>
     <string name="error_confirm_mismatch">Las contraseñas no coinciden</string>
     <string name="error_password_short">La contraseña debe tener al menos 6 caracteres</string>
+
+    <!-- TaskEditScreen -->
+    <string name="new_task_title">Nueva tarea</string>
+    <string name="edit_task_title">Editar tarea</string>
+    <string name="title_label">Título</string>
+    <string name="description_label">Descripción</string>
+    <string name="save_button">Guardar</string>
+    <string name="cancel_button">Cancelar</string>
+
 </resources>
