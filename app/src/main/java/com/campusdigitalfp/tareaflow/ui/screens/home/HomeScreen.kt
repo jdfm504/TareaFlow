@@ -26,7 +26,8 @@ fun HomeScreen(
     onGoToSettings: () -> Unit = {},
     onGoToAbout: () -> Unit = {}
 ) {
-    LaunchedEffect(Unit) { viewModel.seed() }
+    //LaunchedEffect(Unit) { viewModel.seed() } // Lista de prueba local
+    val tasks by viewModel.tasks.collectAsState() // Lista de firestore
 
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -97,7 +98,7 @@ fun HomeScreen(
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            items(viewModel.tasks, key = { it.id }) { task ->
+            items(tasks, key = { it.id }) { task ->
                 TaskRow(
                     task = task,
                     selected = viewModel.selected.contains(task.id),

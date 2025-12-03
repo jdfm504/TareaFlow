@@ -55,6 +55,10 @@ dependencies {
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
     implementation("com.google.firebase:firebase-auth")
+    // Firestore (base de datos)
+    implementation("com.google.firebase:firebase-firestore")
+    // Coroutines para Firestore
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
     //Iconos
     implementation("androidx.compose.material:material-icons-extended")
 
