@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 // Colores principales de TareaFlow
 val GreenPrimary = Color(0xFF31B466)
-val GreenLight = Color(0xFF6DD39B)
+val GreenLight = Color(0xFF0E0E0E)
 val GreenDark = Color(0xFF1E8A55)
 val BlueSecondary = Color(0xFF7CA6AD)
 val BlueTertiary = Color(0xFF888C88)

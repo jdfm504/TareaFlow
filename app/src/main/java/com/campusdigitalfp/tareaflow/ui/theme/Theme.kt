@@ -17,7 +17,11 @@ private val DarkColorScheme = darkColorScheme(
     surfaceVariant = CardDarkBackground,
     onSurfaceVariant = CardDarkTextSecondary,
     outline = CardDarkBorder,
-    error = Color(0xFFD01111)
+    error = Color(0xFFD01111),
+    primaryContainer = GreenLight,
+    onPrimaryContainer = OnBackgroundText,
+    secondaryContainer = BlueSecondary.copy(alpha = 0.2f),
+    onError = GreenLight
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -31,7 +35,10 @@ private val LightColorScheme = lightColorScheme(
     onSurface = CardLightTextPrimary,
     surfaceVariant = CardBackground,
     onSurfaceVariant = CardTextPrimary,
-    outline = CardLightBorder
+    outline = CardLightBorder,
+    primaryContainer = GreenDark,
+    onPrimaryContainer = Color.White,
+    secondaryContainer = BlueSecondary.copy(alpha = 0.25f)
 )
 
 @Composable

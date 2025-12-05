@@ -1,6 +1,12 @@
 package com.campusdigitalfp.tareaflow.ui.screens.home
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,6 +21,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -25,6 +32,7 @@ import androidx.navigation.NavController
 import com.campusdigitalfp.tareaflow.viewmodel.TaskViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.campusdigitalfp.tareaflow.R
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,9 +47,31 @@ fun HomeScreen(
     val context = LocalContext.current
     val auth = FirebaseAuth.getInstance()
 
+    // colores animados para TopBar y FAB
+    val topBarColor by animateColorAsState(
+        targetValue = if (viewModel.isActionMode)
+            MaterialTheme.colorScheme.error
+        else
+            MaterialTheme.colorScheme.primary,
+        label = "TopBarColor"
+    )
+
+    val fabColor by animateColorAsState(
+        targetValue = if (viewModel.isActionMode)
+            MaterialTheme.colorScheme.errorContainer
+        else
+            MaterialTheme.colorScheme.primary,
+        label = "FabColor"
+    )
+
+    // snackbar + scope para lanzarlo
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
     var menuExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -55,7 +85,7 @@ fun HomeScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor =  topBarColor,
                     titleContentColor = Color.White,
                     actionIconContentColor = Color.White
                 ),
@@ -69,11 +99,14 @@ fun HomeScreen(
                 actions = {
                     if (viewModel.isActionMode) {
                         // Botón de borrar visible solo en modo selección
-                        IconButton(onClick = { viewModel.deleteSelected() }) {
+                        IconButton(onClick = { viewModel.deleteSelected()
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar("Tareas eliminadas correctamente")
+                            } }) {
                             Icon(
                                 Icons.Filled.Delete,
                                 contentDescription = stringResource(R.string.menu_delete_selected),
-                                tint = MaterialTheme.colorScheme.error
+                                tint = MaterialTheme.colorScheme.onError
                             )
                         }
                     } else {
@@ -162,7 +195,7 @@ fun HomeScreen(
             if (!viewModel.isActionMode) {
                 FloatingActionButton(
                     onClick = { navController.navigate("task/new") },
-                    containerColor = MaterialTheme.colorScheme.primary
+                    containerColor = fabColor
                 ) {
                     Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.fab_add_cd))
                 }
@@ -176,17 +209,41 @@ fun HomeScreen(
                 .padding(16.dp)
         ) {
             items(tasks, key = { it.id }) { task ->
-                TaskRow(
-                    task = task,
-                    selected = viewModel.selected.contains(task.id),
-                    onClick = {
-                        if (viewModel.isActionMode) viewModel.toggleSelection(task.id)
-                        else {
-                            navController.navigate("task/${task.id}")
-                        }
-                    },
-                    onLongClick = { viewModel.toggleSelection(task.id) }
-                )
+                var visible by remember { mutableStateOf(false) }
+
+                // Cuando el item entra en composición, activamos la animación
+                LaunchedEffect(Unit) {
+                    visible = true
+                }
+
+                // Animación de aparición (fade + slide vertical)
+                AnimatedVisibility(
+                    visible = visible,
+                    enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
+                    exit = fadeOut()
+                ) {
+                    // Simulamos "animateItemPlacement" con un pequeño desplazamiento animado
+                    val offsetY by animateFloatAsState(
+                        targetValue = if (visible) 0f else 30f,
+                        label = "ItemOffset"
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .offset(y = offsetY.dp)
+                    ) {
+                        TaskRow(
+                            task = task,
+                            selected = viewModel.selected.contains(task.id),
+                            onClick = {
+                                if (viewModel.isActionMode) viewModel.toggleSelection(task.id)
+                                else navController.navigate("task/${task.id}")
+                            },
+                            onLongClick = { viewModel.toggleSelection(task.id) }
+                        )
+                    }
+                }
+
                 HorizontalDivider(
                     thickness = 1.dp,
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),

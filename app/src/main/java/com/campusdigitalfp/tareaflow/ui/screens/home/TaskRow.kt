@@ -1,7 +1,10 @@
 package com.campusdigitalfp.tareaflow.ui.screens.home
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -10,8 +13,11 @@ import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -26,9 +32,25 @@ fun TaskRow(
     onLongClick: () -> Unit
 ) {
     val cs = MaterialTheme.colorScheme
+    val isLightTheme = !isSystemInDarkTheme()
 
-    val background = if (selected) cs.primary.copy(alpha = 0.15f) else cs.surface
-    val borderColor = if (selected) cs.primary else cs.outline
+    // Fondo animado al seleccionar
+    val background by animateColorAsState(
+        targetValue = when {
+            selected && !isLightTheme -> Color(0xFF2C2C40) // fondo oscuro elegante
+            selected && isLightTheme -> Color(0xFFE9E7FF)  // lila pastel claro
+            else -> cs.surface
+        },
+        label = "background"
+    )
+
+    // Escala y elevación animadas al seleccionar
+    val scale by animateFloatAsState(
+        targetValue = if (selected) 1.02f else 1f,
+        label = "scale"
+    )
+    val elevation = if (selected) 8.dp else 2.dp
+
     val titleColor = cs.onSurface
     val descColor = cs.onSurfaceVariant
     val iconColor = cs.primary
@@ -36,12 +58,12 @@ fun TaskRow(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 1.dp)
+            .padding(vertical = 4.dp)
+            .scale(scale) // efecto suave de realce
             .combinedClickable(onClick = onClick, onLongClick = onLongClick),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = background),
-        border = BorderStroke(1.dp, borderColor),
-        shape = RoundedCornerShape(10.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = elevation)
     ) {
         Row(
             modifier = Modifier
@@ -75,6 +97,7 @@ fun TaskRow(
                 }
             }
 
+            // Botón de marcar hecho
             IconButton(onClick = { /* toggle done */ }) {
                 Icon(
                     imageVector = Icons.Filled.Done,
