@@ -16,7 +16,8 @@ private val DarkColorScheme = darkColorScheme(
     onSurface = CardDarkTextPrimary,
     surfaceVariant = CardDarkBackground,
     onSurfaceVariant = CardDarkTextSecondary,
-    outline = CardDarkBorder
+    outline = CardDarkBorder,
+    error = Color(0xFFD01111)
 )
 
 private val LightColorScheme = lightColorScheme(

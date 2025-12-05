@@ -57,4 +57,9 @@
     <string name="save_button">Guardar</string>
     <string name="cancel_button">Cancelar</string>
 
+    <!-- OnBoardingScreen -->
+    <string name="onboarding_subtitle">Gestiona tus tareas diarias fácilmente y mantente organizado</string>
+    <string name="onboarding_button">¡Empecemos!</string>
+    <string name="onboarding_login_link">¿Ya tienes cuenta? Inicia sesión</string>
+
 </resources>

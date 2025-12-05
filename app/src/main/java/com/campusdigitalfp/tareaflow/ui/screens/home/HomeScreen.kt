@@ -68,7 +68,7 @@ fun HomeScreen(
                 },
                 actions = {
                     if (viewModel.isActionMode) {
-                        // 🗑️ Botón de borrar visible solo en modo selección
+                        // Botón de borrar visible solo en modo selección
                         IconButton(onClick = { viewModel.deleteSelected() }) {
                             Icon(
                                 Icons.Filled.Delete,
@@ -77,7 +77,7 @@ fun HomeScreen(
                             )
                         }
                     } else {
-                        // 📜 Menú normal
+                        //  Menú normal
                         IconButton(onClick = { menuExpanded = true }) {
                             Icon(
                                 Icons.Filled.Menu,
@@ -190,7 +190,7 @@ fun HomeScreen(
                 HorizontalDivider(
                     thickness = 1.dp,
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    modifier = Modifier.padding(vertical = 2.dp)
                 )
             }
         }

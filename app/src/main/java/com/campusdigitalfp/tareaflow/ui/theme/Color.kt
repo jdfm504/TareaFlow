@@ -7,7 +7,7 @@ val GreenPrimary = Color(0xFF31B466)
 val GreenLight = Color(0xFF6DD39B)
 val GreenDark = Color(0xFF1E8A55)
 val BlueSecondary = Color(0xFF7CA6AD)
-val BlueTertiary = Color(0xFF434942)
+val BlueTertiary = Color(0xFF888C88)
 
 // Colores de fondo y superficie
 val LightBackground = Color(0xFFFCFCFC)

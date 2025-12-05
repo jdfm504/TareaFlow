@@ -51,4 +51,9 @@
     <string name="save_button">Save</string>
     <string name="cancel_button">Cancel</string>
 
+    <string name="onboarding_subtitle">Manage your daily tasks easily and stay organized</string>
+    <string name="onboarding_button">Let’s Go!</string>
+    <string name="onboarding_login_link">Already have an account? Sign in</string>
+
+
 </resources>

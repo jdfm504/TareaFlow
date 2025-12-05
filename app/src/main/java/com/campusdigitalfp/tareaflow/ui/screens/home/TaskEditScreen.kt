@@ -1,6 +1,6 @@
 package com.campusdigitalfp.tareaflow.ui.screens.home
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -134,16 +134,28 @@ fun TaskEditScreen(
                         ),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(stringResource(R.string.save_button))
+                        Text(
+                            stringResource(R.string.save_button),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
                     }
 
                     Spacer(modifier = Modifier.width(16.dp))
 
                     OutlinedButton(
                         onClick = { navController.popBackStack() },
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error
+                        ),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(stringResource(R.string.cancel_button))
+                        Text(
+                            stringResource(R.string.cancel_button),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
                     }
                 }
             }
