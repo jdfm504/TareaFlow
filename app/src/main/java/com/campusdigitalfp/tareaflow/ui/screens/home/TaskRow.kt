@@ -1,11 +1,15 @@
 package com.campusdigitalfp.tareaflow.ui.screens.home
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -29,7 +33,8 @@ fun TaskRow(
     task: Task,
     selected: Boolean,
     onClick: () -> Unit,
-    onLongClick: () -> Unit
+    onLongClick: () -> Unit,
+    onToggleDone: () -> Unit
 ) {
     val cs = MaterialTheme.colorScheme
     val isLightTheme = !isSystemInDarkTheme()
@@ -71,12 +76,6 @@ fun TaskRow(
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = if (task.done) Icons.Filled.CheckCircle else Icons.Filled.Circle,
-                contentDescription = null,
-                tint = iconColor,
-                modifier = Modifier.size(28.dp)
-            )
 
             Spacer(Modifier.width(16.dp))
 
@@ -98,12 +97,44 @@ fun TaskRow(
             }
 
             // Botón de marcar hecho
-            IconButton(onClick = { /* toggle done */ }) {
-                Icon(
-                    imageVector = Icons.Filled.Done,
-                    contentDescription = "Marcar hecho",
-                    tint = iconColor
-                )
+            IconButton(
+                onClick = onToggleDone,
+                modifier = Modifier.size(42.dp)
+            ) {
+                Crossfade(targetState = task.done, label = "doneTransition") { isDone ->
+                    if (isDone) {
+                        // Círculo verde con tick blanco grande
+                        Box(
+                            modifier = Modifier
+                                .size(38.dp)
+                                .background(Color(0xFF31B466), shape = CircleShape)
+                                .padding(4.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Done,
+                                contentDescription = "Marcar como pendiente",
+                                tint = Color.White,
+                                modifier = Modifier.size(26.dp)
+                            )
+                        }
+                    } else {
+                        // Círculo gris vacío
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .border(2.dp, MaterialTheme.colorScheme.outline, CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Done,
+                                contentDescription = "Marcar como completada",
+                                tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+                    }
+                }
             }
         }
     }

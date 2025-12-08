@@ -3,6 +3,7 @@ package com.campusdigitalfp.tareaflow.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.campusdigitalfp.tareaflow.data.AuthRepository
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -63,5 +64,19 @@ class AuthViewModel(
             "no user record" in msg -> "No existe una cuenta con ese correo"
             else -> "Error: ${e.message ?: "desconocido"}"
         }
+    }
+    fun resetPassword(email: String, onResult: (Boolean, String) -> Unit) {
+        if (email.isBlank()) {
+            onResult(false, "Por favor, introduce tu correo electrónico")
+            return
+        }
+
+        FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+            .addOnSuccessListener {
+                onResult(true, "Correo de recuperación enviado a $email")
+            }
+            .addOnFailureListener { e ->
+                onResult(false, "Error: ${e.message}")
+            }
     }
 }

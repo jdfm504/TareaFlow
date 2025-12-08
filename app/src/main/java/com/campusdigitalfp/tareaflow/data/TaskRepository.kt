@@ -1,11 +1,11 @@
-package com.campusdigitalfp.tareaflow.data.model
+package com.campusdigitalfp.tareaflow.data
 
+import com.campusdigitalfp.tareaflow.data.model.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
-import com.campusdigitalfp.tareaflow.data.model.Task
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 
 class TaskRepository {
 

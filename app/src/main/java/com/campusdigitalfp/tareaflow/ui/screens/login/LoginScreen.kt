@@ -26,6 +26,8 @@ import com.campusdigitalfp.tareaflow.viewmodel.AuthUiState
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import java.util.regex.Pattern
 import com.campusdigitalfp.tareaflow.R
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 // Pantalla de login para la aplicación
 @Composable
@@ -42,6 +44,8 @@ fun LoginScreen(
     var passwordError by remember { mutableStateOf<String?>(null) }
     val isLoading = uiState is AuthUiState.Loading
     val context = LocalContext.current
+    var isSendingReset by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     // Validación de email y password
     fun validate(): Boolean {
@@ -156,6 +160,43 @@ fun LoginScreen(
                     fontSize = 12.sp,
                     modifier = Modifier.align(Alignment.Start).padding(start = 16.dp)
                 )
+            }
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            TextButton(
+                onClick = {
+                    if (email.isNotBlank() && !isSendingReset) {
+                        isSendingReset = true
+
+                        viewModel.resetPassword(email) { success, message ->
+                            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+
+                            coroutineScope.launch {
+                                delay(1500)
+                                isSendingReset = false
+                            }
+                        }
+                    } else if (email.isBlank()) {
+                        Toast.makeText(context, "Introduce tu correo primero", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                enabled = !isSendingReset,  // 🔹 desactiva el botón temporalmente
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                if (isSendingReset) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .size(18.dp)
+                                .padding(end = 6.dp),
+                            strokeWidth = 2.dp
+                        )
+                        Text("Enviando…", color = MaterialTheme.colorScheme.primary)
+                    }
+                } else {
+                    Text("¿Has olvidado tu contraseña?")
+                }
             }
 
             Spacer(modifier = Modifier.height(50.dp))

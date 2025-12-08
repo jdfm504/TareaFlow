@@ -3,12 +3,11 @@ package com.campusdigitalfp.tareaflow.viewmodel
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.campusdigitalfp.tareaflow.data.TaskRepository
 import com.campusdigitalfp.tareaflow.data.model.Task
-import com.campusdigitalfp.tareaflow.data.model.TaskRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 class TaskViewModel : ViewModel() {
 
@@ -48,6 +47,12 @@ class TaskViewModel : ViewModel() {
     fun deleteSelected() {
         selected.forEach { repository.deleteTask(it) }
         clearSelection()
+    }
+
+    fun toggleDone(taskId: String) {
+        val task = _tasks.value.find { it.id == taskId } ?: return
+        val updatedTask = task.copy(done = !task.done)
+        repository.updateTask(updatedTask)
     }
 
     fun updateTask(task: Task) {

@@ -233,7 +233,8 @@ fun HomeScreen(
                                 if (viewModel.isActionMode) viewModel.toggleSelection(task.id)
                                 else navController.navigate("task/${task.id}")
                             },
-                            onLongClick = { viewModel.toggleSelection(task.id) }
+                            onLongClick = { viewModel.toggleSelection(task.id) },
+                            onToggleDone = { viewModel.toggleDone(task.id) }
                         )
                     }
                 }
