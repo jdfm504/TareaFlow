@@ -60,7 +60,7 @@ fun TaskEditScreen(
         color = cs.background
     ) {
         if (!initialized) {
-            //  Pantalla de carga mínima (sin saltitos de label)
+            //  Pantalla de carga mínima
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = cs.primary)
             }

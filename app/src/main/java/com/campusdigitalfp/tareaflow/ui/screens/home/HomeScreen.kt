@@ -6,10 +6,11 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -35,6 +36,7 @@ import com.campusdigitalfp.tareaflow.viewmodel.TaskViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.campusdigitalfp.tareaflow.R
 import kotlinx.coroutines.launch
+import com.campusdigitalfp.tareaflow.ui.theme.GreenDark
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,7 +54,7 @@ fun HomeScreen(
     // colores animados para TopBar y FAB
     val topBarColor by animateColorAsState(
         targetValue = if (viewModel.isActionMode)
-            MaterialTheme.colorScheme.error
+            GreenDark
         else
             MaterialTheme.colorScheme.primary,
         label = "TopBarColor"
@@ -99,33 +101,21 @@ fun HomeScreen(
                     }
                 },
                 actions = {
-                    if (viewModel.isActionMode) {
-                        // Botón de borrar visible solo en modo selección
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .padding(end = 12.dp)
-                                .clickable{viewModel.deleteSelected()
-                                    coroutineScope.launch {
-                                        snackbarHostState.showSnackbar("Tareas eliminadas correctamente")
-                                    }
-                                }
-                        ) {
-
-                            Icon(
-                                Icons.Filled.Delete,
-                                contentDescription = "Borrar tareas seleccionadas",
-                                tint = Color.White
-                            )
-
-                            Text(
-                                text = "Borrar",
-                                color = Color.White,
-                                style = MaterialTheme.typography.labelLarge
-                            )
+                    AnimatedVisibility(
+                        visible = viewModel.isActionMode,
+                        enter = fadeIn() + slideInHorizontally(initialOffsetX = { it / 2 }),
+                        exit = fadeOut() + slideOutHorizontally(targetOffsetX = { it / 2 })
+                    ) {
+                        DeleteButton {
+                            viewModel.deleteSelected()
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar("Tareas eliminadas correctamente")
+                            }
                         }
-                    } else {
+                    }
+
                         //  Menú normal
+                    if (!viewModel.isActionMode) {
                         IconButton(onClick = { menuExpanded = true }) {
                             Icon(
                                 Icons.Filled.Menu,
@@ -134,14 +124,11 @@ fun HomeScreen(
                         }
                         DropdownMenu(
                             expanded = menuExpanded,
-                            onDismissRequest = { menuExpanded = false }) {
+                            onDismissRequest = { menuExpanded = false }
+                        ) {
                             DropdownMenuItem(
                                 leadingIcon = {
-                                    Icon(
-                                        Icons.Filled.Add,
-                                        null,
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
+                                    Icon(Icons.Filled.Add, null, tint = MaterialTheme.colorScheme.primary)
                                 },
                                 text = { Text(stringResource(R.string.menu_add_task)) },
                                 onClick = {
@@ -152,11 +139,7 @@ fun HomeScreen(
                             )
                             DropdownMenuItem(
                                 leadingIcon = {
-                                    Icon(
-                                        Icons.Filled.Settings,
-                                        null,
-                                        tint = MaterialTheme.colorScheme.tertiary
-                                    )
+                                    Icon(Icons.Filled.Settings, null, tint = MaterialTheme.colorScheme.tertiary)
                                 },
                                 text = { Text(stringResource(R.string.menu_settings)) },
                                 onClick = {
@@ -166,11 +149,7 @@ fun HomeScreen(
                             )
                             DropdownMenuItem(
                                 leadingIcon = {
-                                    Icon(
-                                        Icons.Filled.Info,
-                                        null,
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
+                                    Icon(Icons.Filled.Info, null, tint = MaterialTheme.colorScheme.primary)
                                 },
                                 text = { Text(stringResource(R.string.menu_about)) },
                                 onClick = {
