@@ -7,6 +7,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,6 +23,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -99,14 +101,27 @@ fun HomeScreen(
                 actions = {
                     if (viewModel.isActionMode) {
                         // Botón de borrar visible solo en modo selección
-                        IconButton(onClick = { viewModel.deleteSelected()
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar("Tareas eliminadas correctamente")
-                            } }) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .padding(end = 12.dp)
+                                .clickable{viewModel.deleteSelected()
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar("Tareas eliminadas correctamente")
+                                    }
+                                }
+                        ) {
+
                             Icon(
                                 Icons.Filled.Delete,
-                                contentDescription = stringResource(R.string.menu_delete_selected),
-                                tint = MaterialTheme.colorScheme.onError
+                                contentDescription = "Borrar tareas seleccionadas",
+                                tint = Color.White
+                            )
+
+                            Text(
+                                text = "Borrar",
+                                color = Color.White,
+                                style = MaterialTheme.typography.labelLarge
                             )
                         }
                     } else {
