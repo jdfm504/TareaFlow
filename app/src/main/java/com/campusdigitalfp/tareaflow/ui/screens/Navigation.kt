@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.campusdigitalfp.tareaflow.ui.navigation.ProtectedRoute
+import com.campusdigitalfp.tareaflow.ui.screens.about.AboutScreen
 import com.campusdigitalfp.tareaflow.ui.screens.home.HomeScreen
 import com.campusdigitalfp.tareaflow.ui.screens.login.LoginScreen
 import com.campusdigitalfp.tareaflow.ui.screens.register.RegisterScreen
@@ -67,5 +68,10 @@ fun TareaFlowNavHost(navController: NavHostController) {
             val taskId = backStackEntry.arguments?.getString("taskId")
             TaskEditScreen(navController = navController, taskId = taskId)
         }
+
+        composable("about") {
+            AboutScreen(navController)
+        }
+
     }
 }

@@ -62,4 +62,15 @@
     <string name="onboarding_button">¡Empecemos!</string>
     <string name="onboarding_login_link">¿Ya tienes cuenta? Inicia sesión</string>
 
+    <!-- AboutScreen -->
+    <string name="about_titulo">Acerca de esta aplicación</string>
+    <string name="about_descripcion">Gestor de Tareas Personales es una aplicación desarrollada por Juan Diego Faci Muñoz como parte del proyecto DAM. Permite organizar tus tareas, gestionar recordatorios y mantener tu productividad al día.</string>
+    <string name="ir_al_sitio_web">Ir al sitio web</string>
+    <string name="obtener_soporte">Obtener soporte</string>
+    <string name="volver">Volver</string>
+    <string name="incidencia_con_gestor">Incidencia con Gestor de Tareas</string>
+    <string name="avatar_del_creador">Avatar del creador</string>
+    <string name="error_app_correo">No se encontró una aplicación de correo</string>
+
+
 </resources>

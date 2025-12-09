@@ -267,7 +267,7 @@ fun HomeScreen(
                                 text = { Text(stringResource(R.string.menu_about)) },
                                 onClick = {
                                     menuExpanded = false
-                                    onGoToAbout()
+                                    navController.navigate("about")
                                 }
                             )
                             DropdownMenuItem(
