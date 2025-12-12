@@ -23,6 +23,12 @@ class TaskViewModel : ViewModel() {
     private var listening = false
     private var tasksJob: Job? = null
 
+    var showPending by mutableStateOf(true)
+        private set
+
+    var showCompleted by mutableStateOf(false)
+        private set
+
     // --------------------------------------------------------------
     // Debe llamarse desde LoginScreen/Navigation
     // cuando el usuario está logueado
@@ -83,5 +89,13 @@ class TaskViewModel : ViewModel() {
 
     fun updateTask(task: Task) {
         repository.updateTask(task)
+    }
+
+    fun togglePending() {
+        showPending = !showPending
+    }
+
+    fun toggleCompleted() {
+        showCompleted = !showCompleted
     }
 }

@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -188,6 +189,8 @@ fun HomeScreen(
     var showPending by remember { mutableStateOf(true) }
     var showCompleted by remember { mutableStateOf(false) }
 
+    val isAnonymous = FirebaseAuth.getInstance().currentUser?.isAnonymous == true
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
@@ -251,6 +254,24 @@ fun HomeScreen(
                                     navController.navigate("task/new")
                                 }
                             )
+
+                            if (isAnonymous) {
+                                DropdownMenuItem(
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Filled.PersonAdd,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    },
+                                    text = { Text(stringResource(R.string.menu_upgrade_account)) },
+                                    onClick = {
+                                        menuExpanded = false
+                                        navController.navigate("register")
+                                    }
+                                )
+                            }
+
                             DropdownMenuItem(
                                 leadingIcon = {
                                     Icon(Icons.Filled.Settings, null, tint = MaterialTheme.colorScheme.tertiary)
@@ -328,8 +349,8 @@ fun HomeScreen(
                 TaskGroup(
                     title = stringResource(R.string.tasks_pending),
                     tasks = pendingTasks,
-                    expanded = showPending,
-                    onToggle = { showPending = !showPending },
+                    expanded = viewModel.showPending,
+                    onToggle = { viewModel.togglePending() },
                     isActionMode = viewModel.isActionMode,
                     isSelected = { id -> viewModel.selected.contains(id) },
                     onRowClick = { task -> navController.navigate("task/${task.id}") },
@@ -346,8 +367,8 @@ fun HomeScreen(
                TaskGroup(
                    title = stringResource(R.string.tasks_completed),
                     tasks = completedTasks,
-                    expanded = showCompleted,
-                    onToggle = { showCompleted = !showCompleted },
+                   expanded = viewModel.showCompleted,
+                   onToggle = { viewModel.toggleCompleted() },
                     isActionMode = viewModel.isActionMode,
                     isSelected = { id -> viewModel.selected.contains(id) },
                     onRowClick = { task -> navController.navigate("task/${task.id}") },

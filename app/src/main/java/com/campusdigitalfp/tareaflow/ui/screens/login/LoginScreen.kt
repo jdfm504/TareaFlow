@@ -24,7 +24,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.campusdigitalfp.tareaflow.viewmodel.AuthUiState
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
-import java.util.regex.Pattern
 import com.campusdigitalfp.tareaflow.R
 import com.campusdigitalfp.tareaflow.ui.theme.GreenPrimary
 import kotlinx.coroutines.delay
@@ -92,7 +91,7 @@ fun LoginScreen(
                 painter = painterResource(id = R.drawable.list),
                 contentDescription = stringResource(R.string.cd_app_logo),
                 modifier = Modifier
-                    .size(50.dp) // Ajusta el tamaño del logo
+                    .size(70.dp) // Ajusta el tamaño del logo
                     .padding(bottom = 20.dp)
             )
 

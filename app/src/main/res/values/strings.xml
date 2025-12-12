@@ -21,6 +21,7 @@
     <string name="tasks_deleted_success">Tareas eliminadas correctamente</string>
     <string name="tasks_pending">Pendientes</string>
     <string name="tasks_completed">Completadas</string>
+    <string name="menu_upgrade_account">Crear cuenta</string>
 
     <!-- Campos -->
     <string name="email_label">Correo electrónico</string>

@@ -20,6 +20,7 @@
     <string name="tasks_deleted_success">Tasks deleted successfully</string>
     <string name="tasks_pending">Pending</string>
     <string name="tasks_completed">Completed</string>
+    <string name="menu_upgrade_account">Create account</string>
 
     <string name="email_label">Email</string>
     <string name="password_label">Password</string>
