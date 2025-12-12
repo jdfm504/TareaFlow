@@ -22,10 +22,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.campusdigitalfp.tareaflow.data.model.Task
+import com.campusdigitalfp.tareaflow.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,6 +40,7 @@ fun TaskRow(
     onToggleDone: () -> Unit
 ) {
     val cs = MaterialTheme.colorScheme
+    val context = LocalContext.current
     val isLightTheme = !isSystemInDarkTheme()
 
     // Fondo animado al seleccionar
@@ -58,7 +62,8 @@ fun TaskRow(
 
     val titleColor = cs.onSurface
     val descColor = cs.onSurfaceVariant
-    val iconColor = cs.primary
+    val markPending = stringResource(R.string.cd_mark_pending)
+    val markCompleted = stringResource(R.string.cd_mark_done)
 
     Card(
         modifier = Modifier
@@ -113,7 +118,7 @@ fun TaskRow(
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Done,
-                                contentDescription = "Marcar como pendiente",
+                                contentDescription = markPending,
                                 tint = Color.White,
                                 modifier = Modifier.size(26.dp)
                             )
@@ -128,7 +133,7 @@ fun TaskRow(
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Done,
-                                contentDescription = "Marcar como completada",
+                                contentDescription = markCompleted,
                                 tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
                                 modifier = Modifier.size(22.dp)
                             )

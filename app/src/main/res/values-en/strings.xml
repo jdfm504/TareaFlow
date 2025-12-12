@@ -17,6 +17,9 @@
     <string name="logout_success">Session closed successfully 👋</string>
     <string name="selection_mode_title">%1$d selected</string>
     <string name="cancel_selection_cd">Cancel selection</string>
+    <string name="tasks_deleted_success">Tasks deleted successfully</string>
+    <string name="tasks_pending">Pending</string>
+    <string name="tasks_completed">Completed</string>
 
     <string name="email_label">Email</string>
     <string name="password_label">Password</string>
@@ -43,6 +46,12 @@
     <string name="error_confirm_empty">Repeat the password</string>
     <string name="error_confirm_mismatch">Passwords do not match</string>
     <string name="error_password_short">Password must be at least 6 characters long</string>
+    <string name="error_email_in_use">That email is already registered</string>
+    <string name="error_wrong_password">Incorrect password</string>
+    <string name="error_no_account">No account exists with that email</string>
+    <string name="error_unknown">An unknown error has occurred</string>
+    <string name="error_reset_email_empty">Please enter your email address</string>
+    <string name="reset_email_sent">Recovery email sent</string>
 
     <string name="new_task_title">New task</string>
     <string name="edit_task_title">Edit task</string>
@@ -63,6 +72,13 @@
     <string name="incidencia_con_gestor">Issue with Task Manager</string>
     <string name="avatar_del_creador">Creator\'s avatar</string>
     <string name="error_app_correo">No email application found</string>
+    <string name="cd_mark_pending">Mark as pending</string>
+    <string name="cd_mark_done">Mark as completed</string>
+
+    <string name="cd_app_logo">App logo</string>
+    <string name="reset_email_prompt">Enter your email first</string>
+    <string name="sending_email">Sending…</string>
+    <string name="forgot_password">Forgot your password?</string>
 
 
 </resources>

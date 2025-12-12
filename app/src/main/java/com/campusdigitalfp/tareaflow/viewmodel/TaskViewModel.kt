@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.campusdigitalfp.tareaflow.data.TaskRepository
 import com.campusdigitalfp.tareaflow.data.model.Task
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -19,15 +20,40 @@ class TaskViewModel : ViewModel() {
     var selected = mutableStateListOf<String>()
     var isActionMode by mutableStateOf(false)
         private set
+    private var listening = false
+    private var tasksJob: Job? = null
 
-    init {
-        viewModelScope.launch {
+    // --------------------------------------------------------------
+    // Debe llamarse desde LoginScreen/Navigation
+    // cuando el usuario está logueado
+    // --------------------------------------------------------------
+    fun startListeningToTasks() {
+        if (listening) return
+        listening = true
+
+        tasksJob = viewModelScope.launch {
             repository.listenToTasks().collect { taskList ->
                 _tasks.value = taskList
             }
         }
     }
 
+    // --------------------------------------------------------------
+    // detener escucha (para logout / cambio de usuario)
+    // --------------------------------------------------------------
+    fun stopListeningToTasks() {
+        tasksJob?.cancel()
+        tasksJob = null
+        listening = false
+
+        // Limpiamos estado para no ver datos del usuario anterior
+        _tasks.value = emptyList()
+        clearSelection()
+    }
+
+    // --------------------------------------------------------------
+    // CRUD
+    // --------------------------------------------------------------
     fun addTask(title: String, description: String) {
         val newTask = Task(title = title, description = description)
         repository.addTask(newTask)

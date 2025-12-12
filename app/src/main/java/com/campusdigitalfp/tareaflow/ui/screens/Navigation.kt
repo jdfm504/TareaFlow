@@ -1,6 +1,7 @@
 package com.campusdigitalfp.tareaflow.ui.screens.login
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -14,12 +15,37 @@ import com.campusdigitalfp.tareaflow.ui.screens.register.RegisterScreen
 import com.google.firebase.auth.FirebaseAuth
 import com.campusdigitalfp.tareaflow.ui.screens.home.TaskEditScreen
 import com.campusdigitalfp.tareaflow.ui.screens.login.OnboardingScreen
+import com.campusdigitalfp.tareaflow.viewmodel.TaskViewModel
+import kotlinx.coroutines.tasks.await
 
 @Composable
-fun TareaFlowNavHost(navController: NavHostController) {
+fun TareaFlowNavHost(
+    navController: NavHostController,
+    taskViewModel: TaskViewModel = viewModel()
+) {
     val auth = FirebaseAuth.getInstance()
+
+    // Validar usuario al arrancar la app
+    LaunchedEffect(Unit) {
+        val user = auth.currentUser
+        if (user != null) {
+            try {
+                // Forzar sincronización con Firebase
+                user.reload().await()
+            } catch (e: Exception) {
+                // Si Firebase dice que el usuario ya no existe → cerrar sesión
+                auth.signOut()
+            }
+        }
+    }
+
     // Si no hay usuario: onboarding. Si lo hay: Home.
     val startDestination = if (auth.currentUser == null) "onboarding" else "home"
+
+    // Si ya está logueado, iniciar escucha de tareas
+    if (auth.currentUser != null) {
+        taskViewModel.startListeningToTasks()
+    }
 
     NavHost(
         navController = navController,
@@ -36,8 +62,9 @@ fun TareaFlowNavHost(navController: NavHostController) {
         composable("login") {
             LoginScreen(
                 onLoginSuccess = {
+                    taskViewModel.startListeningToTasks()
                     navController.navigate("home") {
-                        popUpTo("login") { inclusive = true }
+                        popUpTo(0) { inclusive = true }
                     }
                 },
                 onGoToRegister = { navController.navigate("register") }
@@ -46,8 +73,9 @@ fun TareaFlowNavHost(navController: NavHostController) {
         composable("register") {
             RegisterScreen(
                 onRegisterSuccess = {
+                    taskViewModel.startListeningToTasks()
                     navController.navigate("home") {
-                        popUpTo("register") { inclusive = true }
+                        popUpTo(0) { inclusive = true }
                     }
                 },
                 onGoToLogin = { navController.popBackStack() }
@@ -56,7 +84,11 @@ fun TareaFlowNavHost(navController: NavHostController) {
 
         composable("home") {
             ProtectedRoute(navController) {
-                HomeScreen(navController)
+                // pasamos el mismo TaskViewModel
+                HomeScreen(
+                    navController = navController,
+                    viewModel = taskViewModel
+                )
             }
         }
 

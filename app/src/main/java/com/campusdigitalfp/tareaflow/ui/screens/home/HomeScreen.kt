@@ -152,7 +152,7 @@ fun TaskGroup(
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: TaskViewModel = viewModel(),
+    viewModel: TaskViewModel,
     onGoToSettings: () -> Unit = {},
     onGoToAbout: () -> Unit = {}
 ) {
@@ -223,7 +223,8 @@ fun HomeScreen(
                         DeleteButton {
                             viewModel.deleteSelected()
                             coroutineScope.launch {
-                                snackbarHostState.showSnackbar("Tareas eliminadas correctamente")
+                                val msg = context.getString(R.string.tasks_deleted_success)
+                                snackbarHostState.showSnackbar(msg)
                             }
                         }
                     }
@@ -281,6 +282,8 @@ fun HomeScreen(
                                 text = { Text(stringResource(R.string.menu_logout)) },
                                 onClick = {
                                     menuExpanded = false
+                                    // paramos listener y limpiamos estado
+                                    viewModel.stopListeningToTasks()
                                     auth.signOut()
                                     Toast.makeText(
                                         context,
@@ -323,7 +326,7 @@ fun HomeScreen(
             // PENDIENTES (un solo item que contiene cabecera + grupo)
             item {
                 TaskGroup(
-                    title = "Pendientes",
+                    title = stringResource(R.string.tasks_pending),
                     tasks = pendingTasks,
                     expanded = showPending,
                     onToggle = { showPending = !showPending },
@@ -341,7 +344,7 @@ fun HomeScreen(
             // COMPLETADAS (mismo patrón)
             item {
                TaskGroup(
-                    title = "Completadas",
+                   title = stringResource(R.string.tasks_completed),
                     tasks = completedTasks,
                     expanded = showCompleted,
                     onToggle = { showCompleted = !showCompleted },

@@ -47,8 +47,8 @@ fun RegisterScreen(
             }
 
             is AuthUiState.Error -> {
-                Toast.makeText(context, (uiState as AuthUiState.Error).message, Toast.LENGTH_SHORT)
-                    .show()
+                val id = (uiState as AuthUiState.Error).messageRes
+                Toast.makeText(context, context.getString(id), Toast.LENGTH_SHORT).show()
             }
 
             else -> {}
@@ -298,11 +298,14 @@ fun RegisterScreen(
                         .padding(top = 8.dp)
                 )
 
-                is AuthUiState.Error -> Text(
-                    (uiState as AuthUiState.Error).message,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
+                is AuthUiState.Error -> {
+                    val id = (uiState as AuthUiState.Error).messageRes
+                    Text(
+                        text = stringResource(id),
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
 
                 is AuthUiState.Success, AuthUiState.Idle -> {}
             }

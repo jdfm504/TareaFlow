@@ -89,7 +89,7 @@ fun LoginScreen(
             // Logo
             Image(
                 painter = painterResource(id = R.drawable.list),
-                contentDescription = "Logo de la app",
+                contentDescription = stringResource(R.string.cd_app_logo),
                 modifier = Modifier
                     .size(50.dp) // Ajusta el tamaño del logo
                     .padding(bottom = 20.dp)
@@ -169,19 +169,28 @@ fun LoginScreen(
                     if (email.isNotBlank() && !isSendingReset) {
                         isSendingReset = true
 
-                        viewModel.resetPassword(email) { success, message ->
-                            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                        viewModel.resetPassword(email) { success, messageResId ->
+                            Toast.makeText(
+                                context,
+                                context.getString(messageResId),
+                                Toast.LENGTH_LONG
+                            ).show()
 
                             coroutineScope.launch {
                                 delay(1500)
                                 isSendingReset = false
                             }
                         }
+
                     } else if (email.isBlank()) {
-                        Toast.makeText(context, "Introduce tu correo primero", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.reset_email_prompt),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 },
-                enabled = !isSendingReset,  // 🔹 desactiva el botón temporalmente
+                enabled = !isSendingReset,  // desactiva el botón temporalmente
                 modifier = Modifier.align(Alignment.End)
             ) {
                 if (isSendingReset) {
@@ -192,10 +201,10 @@ fun LoginScreen(
                                 .padding(end = 6.dp),
                             strokeWidth = 2.dp
                         )
-                        Text("Enviando…", color = MaterialTheme.colorScheme.primary)
+                        Text(stringResource(R.string.sending_email), color = MaterialTheme.colorScheme.primary)
                     }
                 } else {
-                    Text("¿Has olvidado tu contraseña?")
+                    Text(stringResource(R.string.forgot_password))
                 }
             }
 
@@ -244,11 +253,8 @@ fun LoginScreen(
                     }
 
                     is AuthUiState.Error -> {
-                        Toast.makeText(
-                            context,
-                            (uiState as AuthUiState.Error).message,
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        val id = (uiState as AuthUiState.Error).messageRes
+                        Toast.makeText(context, context.getString(id), Toast.LENGTH_SHORT).show()
                     }
 
                     else -> {}
@@ -263,11 +269,14 @@ fun LoginScreen(
                         .padding(top = 8.dp)
                 )
 
-                is AuthUiState.Error -> Text(
-                    (uiState as AuthUiState.Error).message,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
+                is AuthUiState.Error -> {
+                    val id = (uiState as AuthUiState.Error).messageRes
+                    Text(
+                        text = stringResource(id),
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
 
                 is AuthUiState.Success, AuthUiState.Idle -> {}
             }

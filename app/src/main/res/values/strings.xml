@@ -18,6 +18,9 @@
     <string name="logout_success">Sesión cerrada correctamente 👋</string>
     <string name="selection_mode_title">%1$d seleccionadas</string>
     <string name="cancel_selection_cd">Cancelar selección</string>
+    <string name="tasks_deleted_success">Tareas eliminadas correctamente</string>
+    <string name="tasks_pending">Pendientes</string>
+    <string name="tasks_completed">Completadas</string>
 
     <!-- Campos -->
     <string name="email_label">Correo electrónico</string>
@@ -48,6 +51,12 @@
     <string name="error_confirm_empty">Repite la contraseña</string>
     <string name="error_confirm_mismatch">Las contraseñas no coinciden</string>
     <string name="error_password_short">La contraseña debe tener al menos 6 caracteres</string>
+    <string name="error_email_in_use">Ese correo ya está registrado</string>
+    <string name="error_wrong_password">Contraseña incorrecta</string>
+    <string name="error_no_account">No existe una cuenta con ese correo</string>
+    <string name="error_unknown">Ha ocurrido un error desconocido</string>
+    <string name="error_reset_email_empty">Por favor, introduce tu correo electrónico</string>
+    <string name="reset_email_sent">Correo de recuperación enviado</string>
 
     <!-- TaskEditScreen -->
     <string name="new_task_title">Nueva tarea</string>
@@ -71,6 +80,15 @@
     <string name="incidencia_con_gestor">Incidencia con Gestor de Tareas</string>
     <string name="avatar_del_creador">Avatar del creador</string>
     <string name="error_app_correo">No se encontró una aplicación de correo</string>
+
+    <string name="cd_mark_pending">Marcar como pendiente</string>
+    <string name="cd_mark_done">Marcar como completada</string>
+
+    <!-- LoginScreen -->
+    <string name="cd_app_logo">Logo de la app</string>
+    <string name="reset_email_prompt">Introduce tu correo primero</string>
+    <string name="sending_email">Enviando…</string>
+    <string name="forgot_password">¿Has olvidado tu contraseña?</string>
 
 
 </resources>
