@@ -57,6 +57,7 @@
     <string name="error_unknown">Ha ocurrido un error desconocido</string>
     <string name="error_reset_email_empty">Por favor, introduce tu correo electrónico</string>
     <string name="reset_email_sent">Correo de recuperación enviado</string>
+    <string name="error_anon_not_allowed">El inicio anónimo no está habilitado en Firebase</string>
 
     <!-- TaskEditScreen -->
     <string name="new_task_title">Nueva tarea</string>
@@ -89,6 +90,6 @@
     <string name="reset_email_prompt">Introduce tu correo primero</string>
     <string name="sending_email">Enviando…</string>
     <string name="forgot_password">¿Has olvidado tu contraseña?</string>
-
+    <string name="login_anonymous">Entrar sin registrarse</string>
 
 </resources>

@@ -1,5 +1,6 @@
 package com.campusdigitalfp.tareaflow.data
 
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
 
@@ -19,4 +20,14 @@ class AuthRepository(
     fun logout() {
         auth.signOut()
     }
+
+    suspend fun loginAnonymously() {
+        FirebaseAuth.getInstance().signInAnonymously().await()
+    }
+
+    suspend fun upgradeAnonymousAccount(email: String, password: String) {
+        val credential = EmailAuthProvider.getCredential(email, password)
+        FirebaseAuth.getInstance().currentUser!!.linkWithCredential(credential).await()
+    }
+
 }

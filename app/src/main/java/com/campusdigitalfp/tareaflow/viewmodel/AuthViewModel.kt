@@ -30,7 +30,15 @@ class AuthViewModel(
 
         viewModelScope.launch {
             try {
-                repo.register(email, password)
+                val auth = FirebaseAuth.getInstance()
+
+                if (auth.currentUser?.isAnonymous == true) {
+                    // Caso 1: era anónimo → upgrade
+                    repo.upgradeAnonymousAccount(email, password)
+                } else {
+                    // Caso 2: registro normal
+                    repo.register(email, password)
+                }
 
                 _state.value = AuthUiState.Success
                 onSuccess()
@@ -79,6 +87,9 @@ class AuthViewModel(
             "no user record" in msg ->
                 R.string.error_no_account
 
+            "operation not allowed" in msg ->
+                R.string.error_anon_not_allowed
+
             else ->
                 R.string.error_unknown
         }
@@ -100,4 +111,19 @@ class AuthViewModel(
                 onResult(false, R.string.error_unknown)
             }
     }
+
+    fun loginAnonymously(onSuccess: () -> Unit) {
+        _state.value = AuthUiState.Loading
+
+        viewModelScope.launch {
+            try {
+                repo.loginAnonymously()
+                _state.value = AuthUiState.Success
+                onSuccess()
+            } catch (e: Exception) {
+                _state.value = AuthUiState.Error(R.string.error_unknown)
+            }
+        }
+    }
+
 }

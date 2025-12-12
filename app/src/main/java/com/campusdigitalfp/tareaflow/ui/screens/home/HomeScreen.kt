@@ -43,6 +43,7 @@ import com.campusdigitalfp.tareaflow.R
 import kotlinx.coroutines.launch
 import com.campusdigitalfp.tareaflow.ui.theme.GreenDark
 import com.campusdigitalfp.tareaflow.data.model.Task
+import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import kotlin.text.contains
 
 @Composable
@@ -154,12 +155,11 @@ fun HomeScreen(
     navController: NavController,
     viewModel: TaskViewModel,
     onGoToSettings: () -> Unit = {},
-    onGoToAbout: () -> Unit = {}
+    authViewModel: AuthViewModel = viewModel()
 ) {
     //LaunchedEffect(Unit) { viewModel.seed() } // Lista de prueba local
     val tasks by viewModel.tasks.collectAsState() // Lista de firestore
     val context = LocalContext.current
-    val auth = FirebaseAuth.getInstance()
 
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -284,7 +284,7 @@ fun HomeScreen(
                                     menuExpanded = false
                                     // paramos listener y limpiamos estado
                                     viewModel.stopListeningToTasks()
-                                    auth.signOut()
+                                    authViewModel.logout()
                                     Toast.makeText(
                                         context,
                                         R.string.logout_success,

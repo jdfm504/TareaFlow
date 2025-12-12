@@ -26,6 +26,7 @@ import com.campusdigitalfp.tareaflow.viewmodel.AuthUiState
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import java.util.regex.Pattern
 import com.campusdigitalfp.tareaflow.R
+import com.campusdigitalfp.tareaflow.ui.theme.GreenPrimary
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -291,6 +292,17 @@ fun LoginScreen(
                     fontSize = 14.sp
                 )
             }
+
+            TextButton(onClick = {
+                viewModel.loginAnonymously { onLoginSuccess() }
+            }) {
+                Text(
+                    text = stringResource(R.string.login_anonymous),
+                    color = GreenPrimary,
+                    fontSize = 14.sp
+                )
+            }
+
         }
     }
 }

@@ -52,6 +52,7 @@
     <string name="error_unknown">An unknown error has occurred</string>
     <string name="error_reset_email_empty">Please enter your email address</string>
     <string name="reset_email_sent">Recovery email sent</string>
+    <string name="error_anon_not_allowed">Anonymous sign-in is not enabled in Firebase</string>
 
     <string name="new_task_title">New task</string>
     <string name="edit_task_title">Edit task</string>
@@ -79,6 +80,6 @@
     <string name="reset_email_prompt">Enter your email first</string>
     <string name="sending_email">Sending…</string>
     <string name="forgot_password">Forgot your password?</string>
-
+    <string name="login_anonymous">Login without registering</string>
 
 </resources>

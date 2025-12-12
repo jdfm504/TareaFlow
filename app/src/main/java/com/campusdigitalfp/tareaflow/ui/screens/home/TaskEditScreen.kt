@@ -24,7 +24,7 @@ import com.campusdigitalfp.tareaflow.R
 @Composable
 fun TaskEditScreen(
     navController: NavController,
-    viewModel: TaskViewModel = viewModel(),
+    viewModel: TaskViewModel,
     taskId: String? = null
 ) {
     val cs = MaterialTheme.colorScheme
@@ -139,7 +139,10 @@ fun TaskEditScreen(
                                 } else {
                                     // Editar tarea
                                     viewModel.updateTask(
-                                        Task(id = taskId, title = title, description = description)
+                                        existingTask!!.copy(
+                                            title = title,
+                                            description = description
+                                        )
                                     )
                                 }
                                 navController.popBackStack()

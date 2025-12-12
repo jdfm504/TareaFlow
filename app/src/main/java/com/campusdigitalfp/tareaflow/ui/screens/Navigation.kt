@@ -15,13 +15,15 @@ import com.campusdigitalfp.tareaflow.ui.screens.register.RegisterScreen
 import com.google.firebase.auth.FirebaseAuth
 import com.campusdigitalfp.tareaflow.ui.screens.home.TaskEditScreen
 import com.campusdigitalfp.tareaflow.ui.screens.login.OnboardingScreen
+import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.TaskViewModel
 import kotlinx.coroutines.tasks.await
 
 @Composable
 fun TareaFlowNavHost(
     navController: NavHostController,
-    taskViewModel: TaskViewModel = viewModel()
+    taskViewModel: TaskViewModel = viewModel(),
+    authViewModel: AuthViewModel = viewModel()
 ) {
     val auth = FirebaseAuth.getInstance()
 
@@ -84,26 +86,31 @@ fun TareaFlowNavHost(
 
         composable("home") {
             ProtectedRoute(navController) {
-                // pasamos el mismo TaskViewModel
                 HomeScreen(
                     navController = navController,
-                    viewModel = taskViewModel
+                    viewModel = taskViewModel,
+                    authViewModel = authViewModel
                 )
             }
         }
 
         composable("task/new") {
-            TaskEditScreen(navController = navController)
+            TaskEditScreen(
+                navController = navController,
+                viewModel = taskViewModel
+            )
         }
 
         composable("task/{taskId}") { backStackEntry ->
             val taskId = backStackEntry.arguments?.getString("taskId")
-            TaskEditScreen(navController = navController, taskId = taskId)
+            TaskEditScreen(
+                navController = navController,
+                viewModel = taskViewModel,
+                taskId = taskId)
         }
 
         composable("about") {
             AboutScreen(navController)
         }
-
     }
 }
