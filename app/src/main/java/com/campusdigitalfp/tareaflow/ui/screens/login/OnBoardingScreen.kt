@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import com.campusdigitalfp.tareaflow.R
 import com.campusdigitalfp.tareaflow.ui.theme.GreenLight
 import com.campusdigitalfp.tareaflow.ui.theme.GreenPrimary
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun OnboardingScreen(
@@ -33,6 +34,14 @@ fun OnboardingScreen(
     val heroFraction = 0.7f // controla la altura de la zona verde
     val config = LocalConfiguration.current
     val screenH = config.screenHeightDp.dp
+    val systemUiController = rememberSystemUiController()
+
+    SideEffect {
+        systemUiController.setStatusBarColor(
+            color = Color.White,
+            darkIcons = true
+        )
+    }
 
     Box(
         modifier = Modifier

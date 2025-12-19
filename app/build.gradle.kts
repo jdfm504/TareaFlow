@@ -64,7 +64,7 @@ dependencies {
 
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.animation:animation")
-
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.5-beta")
 
     testImplementation(libs.junit)
 

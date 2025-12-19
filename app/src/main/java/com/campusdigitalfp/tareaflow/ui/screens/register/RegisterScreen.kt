@@ -24,6 +24,7 @@ import com.campusdigitalfp.tareaflow.viewmodel.AuthUiState
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import java.util.regex.Pattern
 import com.campusdigitalfp.tareaflow.R
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun RegisterScreen(
@@ -34,6 +35,14 @@ fun RegisterScreen(
     val uiState by viewModel.state.collectAsState()
 
     val context = LocalContext.current
+    val systemUiController = rememberSystemUiController()
+
+    SideEffect {
+        systemUiController.setStatusBarColor(
+            color = Color.White,
+            darkIcons = true
+        )
+    }
 
     LaunchedEffect(uiState) {
         when (uiState) {

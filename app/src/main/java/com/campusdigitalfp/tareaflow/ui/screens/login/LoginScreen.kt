@@ -26,6 +26,7 @@ import com.campusdigitalfp.tareaflow.viewmodel.AuthUiState
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import com.campusdigitalfp.tareaflow.R
 import com.campusdigitalfp.tareaflow.ui.theme.GreenPrimary
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -46,6 +47,14 @@ fun LoginScreen(
     val context = LocalContext.current
     var isSendingReset by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    val systemUiController = rememberSystemUiController()
+
+    SideEffect {
+        systemUiController.setStatusBarColor(
+            color = Color.White,
+            darkIcons = true
+        )
+    }
 
     // Validación de email y password
     fun validate(): Boolean {

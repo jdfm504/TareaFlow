@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -19,6 +20,7 @@ import androidx.navigation.NavController
 import com.campusdigitalfp.tareaflow.data.model.Task
 import com.campusdigitalfp.tareaflow.viewmodel.TaskViewModel
 import com.campusdigitalfp.tareaflow.R
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,6 +42,15 @@ fun TaskEditScreen(
 
     // Flag para saber cuándo ya podemos mostrar los TextFields sin “saltos”
     var initialized by rememberSaveable(taskId) { mutableStateOf(false) }
+
+    val systemUiController = rememberSystemUiController()
+
+    SideEffect {
+        systemUiController.setStatusBarColor(
+            color = Color.White,
+            darkIcons = true
+        )
+    }
 
     // Este bloque sincroniza los datos cuando Firestore entrega la tarea
     LaunchedEffect(isEditing, existingTask?.id) {

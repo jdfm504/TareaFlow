@@ -17,6 +17,7 @@ import com.campusdigitalfp.tareaflow.ui.screens.home.TaskEditScreen
 import com.campusdigitalfp.tareaflow.ui.screens.login.OnboardingScreen
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.TaskViewModel
+import com.campusdigitalfp.tareaflow.ui.screens.settings.SettingsScreen
 import kotlinx.coroutines.tasks.await
 
 @Composable
@@ -112,5 +113,10 @@ fun TareaFlowNavHost(
         composable("about") {
             AboutScreen(navController)
         }
+
+        composable("settings") {
+            SettingsScreen(navController)
+        }
+
     }
 }

@@ -185,10 +185,6 @@ fun HomeScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
-    // Variables para agrupar completadas y pendientes
-    var showPending by remember { mutableStateOf(true) }
-    var showCompleted by remember { mutableStateOf(false) }
-
     val isAnonymous = FirebaseAuth.getInstance().currentUser?.isAnonymous == true
 
     Scaffold(
@@ -279,7 +275,7 @@ fun HomeScreen(
                                 text = { Text(stringResource(R.string.menu_settings)) },
                                 onClick = {
                                     menuExpanded = false
-                                    onGoToSettings()
+                                    navController.navigate("settings")
                                 }
                             )
                             DropdownMenuItem(
