@@ -65,6 +65,10 @@ dependencies {
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.animation:animation")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.5-beta")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation(libs.androidx.compose.runtime.saveable)
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.core:core:1.12.0")
 
     testImplementation(libs.junit)
 

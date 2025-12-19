@@ -83,4 +83,30 @@
     <string name="forgot_password">Forgot your password?</string>
     <string name="login_anonymous">Login without registering</string>
 
+    <string name="settings_title">Settings</string>
+
+    <string name="settings_section_appearance">Appearance</string>
+    <string name="settings_section_appearance_desc">Adjust the visual look of the application</string>
+    <string name="settings_dark_theme">Dark theme</string>
+
+    <string name="settings_section_language">Language</string>
+    <string name="settings_section_language_desc">Choose your preferred app language</string>
+    <string name="settings_lang_spanish">Spanish</string>
+    <string name="settings_lang_english">English</string>
+
+    <string name="settings_section_pomodoro">Pomodoro Time</string>
+    <string name="settings_section_pomodoro_desc">Duration of each focus cycle</string>
+
+    <string name="settings_section_password">Password change</string>
+    <string name="settings_section_password_desc">Keep your account protected with a secure password</string>
+    <string name="settings_password_current">Current password</string>
+    <string name="settings_password_new">New password</string>
+    <string name="settings_password_repeat">Repeat password</string>
+
+    <string name="settings_delete_account">Delete account</string>
+    <string name="dialog_delete_title">Delete account?</string>
+    <string name="dialog_delete_message">This action is irreversible. Do you want to continue?</string>
+    <string name="dialog_yes_delete">Yes, delete</string>
+    <string name="dialog_cancel">Cancel</string>
+
 </resources>

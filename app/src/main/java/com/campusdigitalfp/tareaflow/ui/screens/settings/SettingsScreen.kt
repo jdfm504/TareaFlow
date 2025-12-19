@@ -22,22 +22,20 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.campusdigitalfp.tareaflow.ui.theme.GreenPrimary
+import com.campusdigitalfp.tareaflow.R
+import com.campusdigitalfp.tareaflow.viewmodel.PreferencesViewModel
 
 @Composable
 fun SettingsScreen(
-    navController: NavController
+    navController: NavController,
+    prefsViewModel: PreferencesViewModel = viewModel()
 ) {
-    var isDarkTheme by rememberSaveable { mutableStateOf(false) }
-    var selectedLanguage by rememberSaveable { mutableStateOf("es") }
-    var pomodoroTime by rememberSaveable { mutableStateOf("30") }
+    val prefs by prefsViewModel.prefs.collectAsState()
 
-    var currentPassword by rememberSaveable { mutableStateOf("") }
-    var newPassword by rememberSaveable { mutableStateOf("") }
-    var repeatPassword by rememberSaveable { mutableStateOf("") }
-
-    var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
     val systemUiController = rememberSystemUiController()
     SideEffect {
         systemUiController.setStatusBarColor(
@@ -45,6 +43,13 @@ fun SettingsScreen(
             darkIcons = true
         )
     }
+
+    // Estados de contraseña (NO van a Firestore)
+    var currentPassword by rememberSaveable { mutableStateOf("") }
+    var newPassword by rememberSaveable { mutableStateOf("") }
+    var repeatPassword by rememberSaveable { mutableStateOf("") }
+    var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
+
 
     Column(
         modifier = Modifier
@@ -70,7 +75,7 @@ fun SettingsScreen(
             }
 
             Text(
-                text = "Configuración",
+                text = stringResource(R.string.settings_title),
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(start = 4.dp)
             )
@@ -86,16 +91,16 @@ fun SettingsScreen(
 
         // ======================= APARIENCIA =======================
         SectionHeader(
-            title = "Apariencia",
-            description = "Ajusta el aspecto visual de la aplicación"
+            title = stringResource(R.string.settings_section_appearance),
+            description = stringResource(R.string.settings_section_appearance_desc)
         )
 
         SimpleRow(
-            title = "Tema oscuro",
+            title = stringResource(R.string.settings_dark_theme),
             trailing = {
                 ModernSwitch(
-                    checked = isDarkTheme,
-                    onCheckedChange = { isDarkTheme = it }
+                    checked = prefs.darkTheme,
+                    onCheckedChange = { prefsViewModel.setDarkTheme(it) }
                 )
             }
         )
@@ -104,27 +109,29 @@ fun SettingsScreen(
 
         // ======================= IDIOMA =======================
         SectionHeader(
-            title = "Idioma",
-            description = "Selecciona el idioma que prefieres usar"
+            title = stringResource(R.string.settings_section_language),
+            description = stringResource(R.string.settings_section_language_desc)
         )
 
         LanguageSegmentedControl(
-            selected = selectedLanguage,
-            onSelect = { selectedLanguage = it },
+            selected = prefs.language,
+            onSelect = { prefsViewModel.setLanguage(it) }
         )
 
         SoftDivider()
 
         // ======================= POMODORO =======================
         SectionHeader(
-            title = "Tiempo Pomodoro",
-            description = "Duración de cada ciclo de concentración"
+            title = stringResource(R.string.settings_section_pomodoro),
+            description = stringResource(R.string.settings_section_pomodoro_desc)
         )
 
         OutlinedTextField(
-            value = pomodoroTime,
-            onValueChange = {
-                if (it.all(Char::isDigit)) pomodoroTime = it
+            value = prefs.pomodoroMinutes.toString(),
+            onValueChange = { newValue ->
+                if (newValue.all { it.isDigit() } && newValue.isNotEmpty()) {
+                    prefsViewModel.setPomodoro(newValue.toInt())
+                }
             },
             singleLine = true,
             modifier = Modifier.width(120.dp),
@@ -136,8 +143,8 @@ fun SettingsScreen(
 
         // ======================= CONTRASEÑA =======================
         SectionHeader(
-            title = "Cambio de contraseña",
-            description = "Mantén tu cuenta protegida con una contraseña segura"
+            title = stringResource(R.string.settings_section_password),
+            description = stringResource(R.string.settings_section_password_desc)
         )
 
         Column(
@@ -150,7 +157,7 @@ fun SettingsScreen(
             OutlinedTextField(
                 value = currentPassword,
                 onValueChange = { currentPassword = it },
-                label = { Text("Contraseña actual") },
+                label = { Text(stringResource(R.string.settings_password_current)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -160,7 +167,7 @@ fun SettingsScreen(
             OutlinedTextField(
                 value = newPassword,
                 onValueChange = { newPassword = it },
-                label = { Text("Nueva contraseña") },
+                label = { Text(stringResource(R.string.settings_password_new)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -170,7 +177,7 @@ fun SettingsScreen(
             OutlinedTextField(
                 value = repeatPassword,
                 onValueChange = { repeatPassword = it },
-                label = { Text("Repite la contraseña") },
+                label = { Text(stringResource(R.string.settings_password_repeat)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -190,7 +197,7 @@ fun SettingsScreen(
                 .height(56.dp),
             shape = RoundedCornerShape(18.dp)
         ) {
-            Text("Borrar cuenta", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.settings_delete_account), fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
         }
 
         Spacer(Modifier.height(60.dp))
@@ -201,18 +208,18 @@ fun SettingsScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("¿Eliminar cuenta?") },
-            text = { Text("Esta acción es irreversible. ¿Quieres continuar?") },
+            title = { Text(stringResource(R.string.dialog_delete_title)) },
+            text = { Text(stringResource(R.string.dialog_delete_message))  },
             confirmButton = {
                 TextButton(
                     onClick = { showDeleteDialog = false }
                 ) {
-                    Text("Sí, eliminar", color = Color(0xFFE53935))
+                    Text(stringResource(R.string.dialog_yes_delete), color = Color(0xFFE53935))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.dialog_cancel))
                 }
             }
         )
@@ -323,7 +330,7 @@ fun LanguageSegmentedControl(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                "Español",
+                text = stringResource(R.string.settings_lang_spanish),
                 color = if (selected == "es") Color.White else Color.Black,
                 fontWeight = FontWeight.Medium
             )
@@ -340,7 +347,7 @@ fun LanguageSegmentedControl(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                "Inglés",
+                text = stringResource(R.string.settings_lang_english),
                 color = if (selected == "en") Color.White else Color.Black,
                 fontWeight = FontWeight.Medium
             )

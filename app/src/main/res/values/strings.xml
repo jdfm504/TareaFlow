@@ -93,4 +93,36 @@
     <string name="forgot_password">¿Has olvidado tu contraseña?</string>
     <string name="login_anonymous">Entrar sin registrarse</string>
 
+    <!-- SettingsScreen -->
+    <string name="settings_title">Configuración</string>
+
+    <!-- Apariencia -->
+    <string name="settings_section_appearance">Apariencia</string>
+    <string name="settings_section_appearance_desc">Ajusta el aspecto visual de la aplicación</string>
+    <string name="settings_dark_theme">Tema oscuro</string>
+
+    <!-- Idioma -->
+    <string name="settings_section_language">Idioma</string>
+    <string name="settings_section_language_desc">Selecciona el idioma que prefieres usar</string>
+    <string name="settings_lang_spanish">Español</string>
+    <string name="settings_lang_english">Inglés</string>
+
+    <!-- Pomodoro -->
+    <string name="settings_section_pomodoro">Tiempo Pomodoro</string>
+    <string name="settings_section_pomodoro_desc">Duración de cada ciclo de concentración</string>
+
+    <!-- Contraseña -->
+    <string name="settings_section_password">Cambio de contraseña</string>
+    <string name="settings_section_password_desc">Mantén tu cuenta protegida con una contraseña segura</string>
+    <string name="settings_password_current">Contraseña actual</string>
+    <string name="settings_password_new">Nueva contraseña</string>
+    <string name="settings_password_repeat">Repite la contraseña</string>
+
+    <!-- Borrar cuenta -->
+    <string name="settings_delete_account">Borrar cuenta</string>
+    <string name="dialog_delete_title">¿Eliminar cuenta?</string>
+    <string name="dialog_delete_message">Esta acción es irreversible. ¿Quieres continuar?</string>
+    <string name="dialog_yes_delete">Sí, eliminar</string>
+    <string name="dialog_cancel">Cancelar</string>
+
 </resources>
