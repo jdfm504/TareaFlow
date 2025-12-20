@@ -6,15 +6,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.campusdigitalfp.tareaflow.ui.navigation.ProtectedRoute
 import com.campusdigitalfp.tareaflow.ui.screens.about.AboutScreen
 import com.campusdigitalfp.tareaflow.ui.screens.home.HomeScreen
-import com.campusdigitalfp.tareaflow.ui.screens.login.LoginScreen
 import com.campusdigitalfp.tareaflow.ui.screens.register.RegisterScreen
 import com.google.firebase.auth.FirebaseAuth
 import com.campusdigitalfp.tareaflow.ui.screens.home.TaskEditScreen
-import com.campusdigitalfp.tareaflow.ui.screens.login.OnboardingScreen
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.TaskViewModel
 import com.campusdigitalfp.tareaflow.ui.screens.settings.SettingsScreen
@@ -117,6 +114,5 @@ fun TareaFlowNavHost(
         composable("settings") {
             SettingsScreen(navController)
         }
-
     }
 }

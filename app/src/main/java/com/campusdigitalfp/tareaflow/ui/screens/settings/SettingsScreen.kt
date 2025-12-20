@@ -5,7 +5,6 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -13,7 +12,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -31,10 +29,10 @@ import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.campusdigitalfp.tareaflow.MainActivity
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.campusdigitalfp.tareaflow.ui.theme.GreenPrimary
 import com.campusdigitalfp.tareaflow.R
 import com.campusdigitalfp.tareaflow.ui.theme.ApplyStatusBarTheme
 import com.campusdigitalfp.tareaflow.viewmodel.PreferencesViewModel
+import com.campusdigitalfp.tareaflow.viewmodel.UserProfileViewModel
 
 @Composable
 fun SettingsScreen(
@@ -46,12 +44,11 @@ fun SettingsScreen(
     val context = LocalContext.current
     val activity = context as? Activity
 
-    var showLanguageDialog by rememberSaveable { mutableStateOf(false) }
-    var pendingLanguage by rememberSaveable { mutableStateOf<String?>(null) }
-
-
     // Ajustar la status bar según el tema
     val systemUiController = rememberSystemUiController()
+
+    val profileViewModel: UserProfileViewModel = viewModel()
+    val profile by profileViewModel.profile.collectAsState()
 
     ApplyStatusBarTheme()
 
@@ -97,6 +94,23 @@ fun SettingsScreen(
                 .fillMaxWidth()
                 .padding(vertical = 18.dp)
         )
+
+        // ======================= NOMBRE USUARIO =======================
+        SectionHeader(
+            title = stringResource(R.string.settings_profile_title),
+            description = stringResource(R.string.settings_profile_desc)
+        )
+
+        OutlinedTextField(
+            value = profile.name,
+            onValueChange = { newValue ->
+                profileViewModel.updateName(newValue)
+            },
+            label = { Text(stringResource(R.string.settings_profile_name)) },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        SoftDivider()
 
         // ======================= APARIENCIA =======================
         SectionHeader(
@@ -235,55 +249,9 @@ fun SettingsScreen(
             }
         )
     }
-    // --- Diálogo para cambiar idioma (requiere reinicio) ---
-    if (showLanguageDialog && pendingLanguage != null) {
-        AlertDialog(
-            onDismissRequest = { showLanguageDialog = false },
-            title = { Text(text = stringResource(R.string.settings_language_dialog_title)) },
-            text = { Text(stringResource(R.string.settings_language_dialog_message)) },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        val lang = pendingLanguage!!
-
-                        // 1) Guardar en Firestore
-                        prefsViewModel.setLanguage(lang)
-
-                        // 2) Aplicar locales
-                        val locales = LocaleListCompat.forLanguageTags(lang)
-                        AppCompatDelegate.setApplicationLocales(locales)
-
-                        // 3) Reiniciar la app
-                        showLanguageDialog = false
-                        pendingLanguage = null
-
-                        activity?.let {
-                            it.finishAffinity()
-                            it.startActivity(Intent(it, MainActivity::class.java))
-                        }
-                    }
-                ) {
-                    Text(stringResource(R.string.dialog_restart_now))
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        showLanguageDialog = false
-                        pendingLanguage = null
-                    }
-                ) {
-                    Text(stringResource(R.string.dialog_cancel))
-                }
-            }
-        )
-    }
-
 }
 
-
 // ======================= COMPONENTES =======================
-
 @Composable
 fun SectionHeader(title: String, description: String) {
     Column(

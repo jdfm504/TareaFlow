@@ -91,6 +91,9 @@
     <string name="dialog_language_message">To apply the new language, the app needs to restart. Would you like to restart now?</string>
     <string name="dialog_relaunch_now">Restart now</string>
     <string name="dialog_later">Later</string>
+    <string name="settings_profile_title">Profile</string>
+    <string name="settings_profile_desc">Manage your user information</string>
+    <string name="settings_profile_name">Name</string>
 
     <string name="settings_section_appearance">Appearance</string>
     <string name="settings_section_appearance_desc">Adjust the visual look of the application</string>

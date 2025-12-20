@@ -8,20 +8,16 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.campusdigitalfp.tareaflow.data.model.Task
 import com.campusdigitalfp.tareaflow.viewmodel.TaskViewModel
 import com.campusdigitalfp.tareaflow.R
 import com.campusdigitalfp.tareaflow.ui.theme.ApplyStatusBarTheme
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -143,12 +139,14 @@ fun TaskEditScreen(
                                     viewModel.addTask(title, description)
                                 } else {
                                     // Editar tarea
-                                    viewModel.updateTask(
-                                        existingTask!!.copy(
-                                            title = title,
-                                            description = description
+                                    existingTask?.let { safeTask ->
+                                        viewModel.updateTask(
+                                            safeTask.copy(
+                                                title = title,
+                                                description = description
+                                            )
                                         )
-                                    )
+                                    }
                                 }
                                 navController.popBackStack()
                             }

@@ -25,7 +25,6 @@ import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import java.util.regex.Pattern
 import com.campusdigitalfp.tareaflow.R
 import com.campusdigitalfp.tareaflow.ui.theme.ApplyStatusBarTheme
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun RegisterScreen(
@@ -267,7 +266,13 @@ fun RegisterScreen(
             Button(
                 onClick = {
                     if (validate()) {
-                        viewModel.register(email, password) { onRegisterSuccess() }
+                        viewModel.register(email, password) {
+
+                            // Guardamos el nombre en el perfil
+                            viewModel.saveUserName(name)
+                            // Éxito → Navegamos
+                            onRegisterSuccess()
+                        }
                     }
                 },
                 enabled = !isLoading, // desactiva cuando está cargando

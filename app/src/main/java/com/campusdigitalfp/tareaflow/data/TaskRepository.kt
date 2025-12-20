@@ -7,6 +7,7 @@ import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.tasks.await
 
 class TaskRepository {
 
@@ -46,23 +47,24 @@ class TaskRepository {
     }
 
     // Agregar una nueva tarea
-    fun addTask(task: Task) {
+    suspend fun addTask(task: Task) {
         val doc = getUserTasksCollection().document() // crea el doc con ID de usuario
         val taskWithId = task.copy(id = doc.id)      // copia el ID dentro del objeto
-        doc.set(taskWithId)                          // guarda el objeto con su id dentro
+        doc.set(taskWithId).await()                  // guarda el objeto con su id dentro
     }
 
     // Eliminar una tarea
-    fun deleteTask(taskId: String) {
-        getUserTasksCollection().document(taskId).delete()
+    suspend fun deleteTask(taskId: String) {
+        getUserTasksCollection().document(taskId).delete().await()
     }
 
     // Editar una tarea
-    fun updateTask(task: Task) {
+    suspend fun updateTask(task: Task) {
         if (task.id.isNotBlank()) {
             getUserTasksCollection()
                 .document(task.id)
                 .set(task)
+                .await()
         }
     }
 }

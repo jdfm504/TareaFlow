@@ -9,25 +9,29 @@ class AuthRepository(
 ) {
     val currentUser get() = auth.currentUser
 
+    // Registro
     suspend fun register(email: String, password: String) {
         auth.createUserWithEmailAndPassword(email, password).await()
     }
 
+    // Login
     suspend fun login(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password).await()
     }
 
+    // Logout
     fun logout() {
         auth.signOut()
     }
 
+    // Login anónimo
     suspend fun loginAnonymously() {
-        FirebaseAuth.getInstance().signInAnonymously().await()
+        auth.signInAnonymously().await()
     }
 
+    // Upgrade de anónimo a usuario registrado
     suspend fun upgradeAnonymousAccount(email: String, password: String) {
         val credential = EmailAuthProvider.getCredential(email, password)
-        FirebaseAuth.getInstance().currentUser!!.linkWithCredential(credential).await()
+        auth.currentUser!!.linkWithCredential(credential).await()
     }
-
 }

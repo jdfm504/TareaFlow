@@ -27,7 +27,6 @@ import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import com.campusdigitalfp.tareaflow.R
 import com.campusdigitalfp.tareaflow.ui.theme.ApplyStatusBarTheme
 import com.campusdigitalfp.tareaflow.ui.theme.GreenPrimary
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -253,7 +252,6 @@ fun LoginScreen(
                     is AuthUiState.Success -> {
                         Toast.makeText(context, context.getString(R.string.login_success), Toast.LENGTH_SHORT)
                             .show()
-                        onLoginSuccess()
                     }
 
                     is AuthUiState.Error -> {
@@ -305,7 +303,6 @@ fun LoginScreen(
                     fontSize = 14.sp
                 )
             }
-
         }
     }
 }

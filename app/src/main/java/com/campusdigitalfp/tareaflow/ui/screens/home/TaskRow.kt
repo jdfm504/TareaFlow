@@ -3,7 +3,6 @@ package com.campusdigitalfp.tareaflow.ui.screens.home
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
@@ -12,8 +11,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -118,7 +115,7 @@ fun TaskRow(
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Done,
-                                contentDescription = markPending,
+                                contentDescription = markCompleted,
                                 tint = Color.White,
                                 modifier = Modifier.size(26.dp)
                             )
@@ -133,7 +130,7 @@ fun TaskRow(
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Done,
-                                contentDescription = markCompleted,
+                                contentDescription = markPending,
                                 tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
                                 modifier = Modifier.size(22.dp)
                             )

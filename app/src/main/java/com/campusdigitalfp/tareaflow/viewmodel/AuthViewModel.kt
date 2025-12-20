@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.campusdigitalfp.tareaflow.R
+import com.campusdigitalfp.tareaflow.data.UserProfileRepository
 
 sealed class AuthUiState {
     data object Idle : AuthUiState()
@@ -22,8 +23,6 @@ class AuthViewModel(
 
     private val _state = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
     val state: StateFlow<AuthUiState> = _state
-
-    fun isLoggedIn(): Boolean = repo.currentUser != null
 
     fun register(email: String, password: String, onSuccess: () -> Unit) {
         _state.value = AuthUiState.Loading
@@ -123,6 +122,13 @@ class AuthViewModel(
             } catch (e: Exception) {
                 _state.value = AuthUiState.Error(R.string.error_unknown)
             }
+        }
+    }
+
+    fun saveUserName(name: String) {
+        viewModelScope.launch {
+            val repo = UserProfileRepository()
+            repo.updateName(name)
         }
     }
 

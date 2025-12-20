@@ -25,7 +25,6 @@ import com.campusdigitalfp.tareaflow.R
 import com.campusdigitalfp.tareaflow.ui.theme.ApplyStatusBarTheme
 import com.campusdigitalfp.tareaflow.ui.theme.GreenLight
 import com.campusdigitalfp.tareaflow.ui.theme.GreenPrimary
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun OnboardingScreen(

@@ -14,13 +14,11 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PersonAdd
@@ -45,7 +43,7 @@ import kotlinx.coroutines.launch
 import com.campusdigitalfp.tareaflow.ui.theme.GreenDark
 import com.campusdigitalfp.tareaflow.data.model.Task
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
-import kotlin.text.contains
+import com.campusdigitalfp.tareaflow.viewmodel.UserProfileViewModel
 
 @Composable
 fun SectionHeader(
@@ -187,6 +185,9 @@ fun HomeScreen(
 
     val isAnonymous = FirebaseAuth.getInstance().currentUser?.isAnonymous == true
 
+    val profileViewModel: UserProfileViewModel = viewModel()
+    val profile by profileViewModel.profile.collectAsState()
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
@@ -199,6 +200,11 @@ fun HomeScreen(
                         )
                     } else {
                         Text(stringResource(R.string.home_title))
+                        Text(
+                            text = "Hola, ${profile.name}",
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -240,6 +246,11 @@ fun HomeScreen(
                             expanded = menuExpanded,
                             onDismissRequest = { menuExpanded = false }
                         ) {
+                            DropdownMenuItem(
+                                text = { Text("👤 ${profile.name}") },
+                                onClick = {}
+                            )
+
                             DropdownMenuItem(
                                 leadingIcon = {
                                     Icon(Icons.Filled.Add, null, tint = MaterialTheme.colorScheme.primary)
@@ -358,7 +369,7 @@ fun HomeScreen(
             // Separador visual entre grupos
             item { Spacer(Modifier.height(12.dp)) }
 
-            // COMPLETADAS (mismo patrón)
+            // COMPLETADAS
             item {
                TaskGroup(
                    title = stringResource(R.string.tasks_completed),

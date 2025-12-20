@@ -61,8 +61,10 @@ class TaskViewModel : ViewModel() {
     // CRUD
     // --------------------------------------------------------------
     fun addTask(title: String, description: String) {
-        val newTask = Task(title = title, description = description)
-        repository.addTask(newTask)
+        viewModelScope.launch {
+            val newTask = Task(title = title, description = description)
+            repository.addTask(newTask)
+        }
     }
 
     fun toggleSelection(taskId: String) {
@@ -77,18 +79,24 @@ class TaskViewModel : ViewModel() {
     }
 
     fun deleteSelected() {
-        selected.forEach { repository.deleteTask(it) }
-        clearSelection()
+        viewModelScope.launch {
+            selected.forEach { repository.deleteTask(it) }
+            clearSelection()
+        }
     }
 
     fun toggleDone(taskId: String) {
-        val task = _tasks.value.find { it.id == taskId } ?: return
-        val updatedTask = task.copy(done = !task.done)
-        repository.updateTask(updatedTask)
+        viewModelScope.launch {
+            val task = _tasks.value.find { it.id == taskId } ?: return@launch
+            val updatedTask = task.copy(done = !task.done)
+            repository.updateTask(updatedTask)
+        }
     }
 
     fun updateTask(task: Task) {
-        repository.updateTask(task)
+        viewModelScope.launch {
+            repository.updateTask(task)
+        }
     }
 
     fun togglePending() {
