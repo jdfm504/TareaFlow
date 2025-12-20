@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.androidx.compose.runtime.saveable)
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.core:core:1.12.0")
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
     testImplementation(libs.junit)
 

@@ -20,6 +20,7 @@ import androidx.navigation.NavController
 import com.campusdigitalfp.tareaflow.data.model.Task
 import com.campusdigitalfp.tareaflow.viewmodel.TaskViewModel
 import com.campusdigitalfp.tareaflow.R
+import com.campusdigitalfp.tareaflow.ui.theme.ApplyStatusBarTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,14 +44,7 @@ fun TaskEditScreen(
     // Flag para saber cuándo ya podemos mostrar los TextFields sin “saltos”
     var initialized by rememberSaveable(taskId) { mutableStateOf(false) }
 
-    val systemUiController = rememberSystemUiController()
-
-    SideEffect {
-        systemUiController.setStatusBarColor(
-            color = Color.White,
-            darkIcons = true
-        )
-    }
+    ApplyStatusBarTheme()
 
     // Este bloque sincroniza los datos cuando Firestore entrega la tarea
     LaunchedEffect(isEditing, existingTask?.id) {

@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.campusdigitalfp.tareaflow.viewmodel.AuthUiState
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import com.campusdigitalfp.tareaflow.R
+import com.campusdigitalfp.tareaflow.ui.theme.ApplyStatusBarTheme
 import com.campusdigitalfp.tareaflow.ui.theme.GreenPrimary
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
@@ -47,14 +48,8 @@ fun LoginScreen(
     val context = LocalContext.current
     var isSendingReset by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
-    val systemUiController = rememberSystemUiController()
 
-    SideEffect {
-        systemUiController.setStatusBarColor(
-            color = Color.White,
-            darkIcons = true
-        )
-    }
+    ApplyStatusBarTheme()
 
     // Validación de email y password
     fun validate(): Boolean {

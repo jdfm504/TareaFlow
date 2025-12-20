@@ -32,14 +32,6 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 @Composable
 fun AboutScreen(navController: NavController) {
     val context = LocalContext.current
-    val systemUiController = rememberSystemUiController()
-
-    SideEffect {
-        systemUiController.setStatusBarColor(
-            color = Color.White,
-            darkIcons = true
-        )
-    }
 
     Scaffold(
         topBar = {

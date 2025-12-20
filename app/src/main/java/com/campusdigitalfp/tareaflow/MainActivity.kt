@@ -14,22 +14,25 @@ import androidx.navigation.compose.rememberNavController
 import com.campusdigitalfp.tareaflow.ui.screens.login.TareaFlowNavHost
 import com.campusdigitalfp.tareaflow.ui.theme.TareaFlowTheme
 import com.campusdigitalfp.tareaflow.viewmodel.PreferencesViewModel
+import com.campusdigitalfp.tareaflow.ui.screens.loading.LoadingScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            // 1) Cargar preferencias de Firestore
+            // Cargar preferencias de Firestore
             val prefsViewModel: PreferencesViewModel = viewModel()
             val prefs by prefsViewModel.prefs.collectAsState()
 
-            // Cambiar el idioma dinámicamente
-            LaunchedEffect(prefs.language) {
-                val locales = LocaleListCompat.forLanguageTags(prefs.language)
-                AppCompatDelegate.setApplicationLocales(locales)
+            val isLoaded by prefsViewModel.isLoaded.collectAsState()
+
+            // Mostrar pantalla de carga hasta tener las preferencias
+            if (!isLoaded) {
+                LoadingScreen()
+                return@setContent
             }
 
-            // 2) Aplicar tema oscuro según preferencias del usuario
+            // Aplicar tema visual desde Firestore
             TareaFlowTheme(darkTheme = prefs.darkTheme) {
 
                 Surface {

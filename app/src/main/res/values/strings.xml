@@ -95,6 +95,13 @@
 
     <!-- SettingsScreen -->
     <string name="settings_title">Configuración</string>
+    <string name="settings_language_dialog_title">Cambiar idioma</string>
+    <string name="settings_language_dialog_message">Para aplicar el nuevo idioma es necesario reiniciar la aplicación.</string>
+    <string name="dialog_restart_now">Reiniciar ahora</string>
+    <string name="dialog_language_title">Cambiar idioma</string>
+    <string name="dialog_language_message">Para aplicar el nuevo idioma es necesario reiniciar la aplicación. ¿Quieres hacerlo ahora?</string>
+    <string name="dialog_relaunch_now">Reiniciar ahora</string>
+    <string name="dialog_later">Más tarde</string>
 
     <!-- Apariencia -->
     <string name="settings_section_appearance">Apariencia</string>

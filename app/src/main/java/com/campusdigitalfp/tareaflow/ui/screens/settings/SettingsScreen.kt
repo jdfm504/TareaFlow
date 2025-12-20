@@ -1,5 +1,8 @@
 package com.campusdigitalfp.tareaflow.ui.screens.settings
 
+import android.app.Activity
+import android.content.Intent
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,11 +25,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.campusdigitalfp.tareaflow.MainActivity
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.campusdigitalfp.tareaflow.ui.theme.GreenPrimary
 import com.campusdigitalfp.tareaflow.R
+import com.campusdigitalfp.tareaflow.ui.theme.ApplyStatusBarTheme
 import com.campusdigitalfp.tareaflow.viewmodel.PreferencesViewModel
 
 @Composable
@@ -36,15 +43,19 @@ fun SettingsScreen(
 ) {
     val prefs by prefsViewModel.prefs.collectAsState()
 
-    val systemUiController = rememberSystemUiController()
-    SideEffect {
-        systemUiController.setStatusBarColor(
-            color = Color.White,
-            darkIcons = true
-        )
-    }
+    val context = LocalContext.current
+    val activity = context as? Activity
 
-    // Estados de contraseña (NO van a Firestore)
+    var showLanguageDialog by rememberSaveable { mutableStateOf(false) }
+    var pendingLanguage by rememberSaveable { mutableStateOf<String?>(null) }
+
+
+    // Ajustar la status bar según el tema
+    val systemUiController = rememberSystemUiController()
+
+    ApplyStatusBarTheme()
+
+    // Estados locales
     var currentPassword by rememberSaveable { mutableStateOf("") }
     var newPassword by rememberSaveable { mutableStateOf("") }
     var repeatPassword by rememberSaveable { mutableStateOf("") }
@@ -55,29 +66,27 @@ fun SettingsScreen(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 22.dp, vertical = 18.dp)
     ) {
 
         // ------------------ TITULO ------------------
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
             IconButton(onClick = { navController.popBackStack() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Volver",
-                    tint = GreenPrimary
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
 
             Text(
                 text = stringResource(R.string.settings_title),
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(start = 4.dp)
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
 
@@ -86,7 +95,7 @@ fun SettingsScreen(
             thickness = 2.dp,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 24.dp)
+                .padding(vertical = 18.dp)
         )
 
         // ======================= APARIENCIA =======================
@@ -107,19 +116,6 @@ fun SettingsScreen(
 
         SoftDivider()
 
-        // ======================= IDIOMA =======================
-        SectionHeader(
-            title = stringResource(R.string.settings_section_language),
-            description = stringResource(R.string.settings_section_language_desc)
-        )
-
-        LanguageSegmentedControl(
-            selected = prefs.language,
-            onSelect = { prefsViewModel.setLanguage(it) }
-        )
-
-        SoftDivider()
-
         // ======================= POMODORO =======================
         SectionHeader(
             title = stringResource(R.string.settings_section_pomodoro),
@@ -128,9 +124,9 @@ fun SettingsScreen(
 
         OutlinedTextField(
             value = prefs.pomodoroMinutes.toString(),
-            onValueChange = { newValue ->
-                if (newValue.all { it.isDigit() } && newValue.isNotEmpty()) {
-                    prefsViewModel.setPomodoro(newValue.toInt())
+            onValueChange = { v ->
+                if (v.all { it.isDigit() } && v.isNotBlank()) {
+                    prefsViewModel.setPomodoro(v.toInt())
                 }
             },
             singleLine = true,
@@ -151,15 +147,14 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(20.dp))
-                .border(1.dp, Color(0xFFDADADA), RoundedCornerShape(20.dp))
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp))
                 .padding(18.dp)
         ) {
             OutlinedTextField(
                 value = currentPassword,
                 onValueChange = { currentPassword = it },
                 label = { Text(stringResource(R.string.settings_password_current)) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(Modifier.height(14.dp))
@@ -168,8 +163,7 @@ fun SettingsScreen(
                 value = newPassword,
                 onValueChange = { newPassword = it },
                 label = { Text(stringResource(R.string.settings_password_new)) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(Modifier.height(14.dp))
@@ -178,8 +172,7 @@ fun SettingsScreen(
                 value = repeatPassword,
                 onValueChange = { repeatPassword = it },
                 label = { Text(stringResource(R.string.settings_password_repeat)) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                modifier = Modifier.fillMaxWidth()
             )
         }
 
@@ -189,41 +182,103 @@ fun SettingsScreen(
         Button(
             onClick = { showDeleteDialog = true },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFE53935),
-                contentColor = Color.White
+                containerColor = MaterialTheme.colorScheme.error,
+                contentColor = MaterialTheme.colorScheme.onError
             ),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
             shape = RoundedCornerShape(18.dp)
         ) {
-            Text(stringResource(R.string.settings_delete_account), fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+            Text(
+                text = stringResource(R.string.settings_delete_account),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold
+            )
         }
 
         Spacer(Modifier.height(60.dp))
 
     }
 
-    // ------------------ DIALOGO ------------------
+    // ------------------ DIÁLOGO ------------------
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text(stringResource(R.string.dialog_delete_title)) },
-            text = { Text(stringResource(R.string.dialog_delete_message))  },
+            title = {
+                Text(
+                    text = stringResource(R.string.dialog_delete_title),
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.dialog_delete_message),
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            },
             confirmButton = {
-                TextButton(
-                    onClick = { showDeleteDialog = false }
-                ) {
-                    Text(stringResource(R.string.dialog_yes_delete), color = Color(0xFFE53935))
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text(
+                        text = stringResource(R.string.dialog_yes_delete),
+                        color = MaterialTheme.colorScheme.error
+                    )
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
+                    Text(
+                        text = stringResource(R.string.dialog_cancel),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        )
+    }
+    // --- Diálogo para cambiar idioma (requiere reinicio) ---
+    if (showLanguageDialog && pendingLanguage != null) {
+        AlertDialog(
+            onDismissRequest = { showLanguageDialog = false },
+            title = { Text(text = stringResource(R.string.settings_language_dialog_title)) },
+            text = { Text(stringResource(R.string.settings_language_dialog_message)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val lang = pendingLanguage!!
+
+                        // 1) Guardar en Firestore
+                        prefsViewModel.setLanguage(lang)
+
+                        // 2) Aplicar locales
+                        val locales = LocaleListCompat.forLanguageTags(lang)
+                        AppCompatDelegate.setApplicationLocales(locales)
+
+                        // 3) Reiniciar la app
+                        showLanguageDialog = false
+                        pendingLanguage = null
+
+                        activity?.let {
+                            it.finishAffinity()
+                            it.startActivity(Intent(it, MainActivity::class.java))
+                        }
+                    }
+                ) {
+                    Text(stringResource(R.string.dialog_restart_now))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showLanguageDialog = false
+                        pendingLanguage = null
+                    }
+                ) {
                     Text(stringResource(R.string.dialog_cancel))
                 }
             }
         )
     }
+
 }
 
 
@@ -237,13 +292,13 @@ fun SectionHeader(title: String, description: String) {
         Text(
             text = title,
             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-            modifier = Modifier.padding(bottom = 2.dp)
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         Text(
             text = description,
-            style = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFF666666)),
-            modifier = Modifier.padding(bottom = 10.dp)
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
@@ -276,7 +331,7 @@ fun SimpleRow(
 @Composable
 fun SoftDivider() {
     Divider(
-        color = Color(0xFFE5E5E5),
+        color = MaterialTheme.colorScheme.outlineVariant,
         thickness = 1.dp,
         modifier = Modifier
             .fillMaxWidth()
@@ -289,68 +344,12 @@ fun ModernSwitch(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    val switchColors = SwitchDefaults.colors(
-        checkedThumbColor = Color.White,
+    val colors = SwitchDefaults.colors(
+        checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
         checkedTrackColor = MaterialTheme.colorScheme.primary,
-        uncheckedThumbColor = Color.White,
-        uncheckedTrackColor = Color(0xFFC8C8C8)
+        uncheckedThumbColor = MaterialTheme.colorScheme.onSurface,
+        uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
     )
 
-    Switch(
-        checked = checked,
-        onCheckedChange = onCheckedChange,
-        colors = switchColors
-    )
-}
-@Composable
-fun LanguageSegmentedControl(
-    selected: String,
-    onSelect: (String) -> Unit
-) {
-    val selectedColor = MaterialTheme.colorScheme.primary
-    val unselectedColor = Color.White
-
-    Row(
-        modifier = Modifier
-            .width(200.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .border(2.dp, selectedColor, RoundedCornerShape(16.dp))
-            .padding(4.dp)
-            .height(40.dp)
-    ) {
-
-        // Español
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .clip(RoundedCornerShape(12.dp))
-                .background(if (selected == "es") selectedColor else unselectedColor)
-                .clickable { onSelect("es") }
-                .padding(vertical = 8.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = stringResource(R.string.settings_lang_spanish),
-                color = if (selected == "es") Color.White else Color.Black,
-                fontWeight = FontWeight.Medium
-            )
-        }
-
-        // Inglés
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .clip(RoundedCornerShape(12.dp))
-                .background(if (selected == "en") selectedColor else unselectedColor)
-                .clickable { onSelect("en") }
-                .padding(vertical = 8.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = stringResource(R.string.settings_lang_english),
-                color = if (selected == "en") Color.White else Color.Black,
-                fontWeight = FontWeight.Medium
-            )
-        }
-    }
+    Switch(checked = checked, onCheckedChange = onCheckedChange, colors = colors)
 }

@@ -15,34 +15,30 @@ class PreferencesViewModel : ViewModel() {
     private val _prefs = MutableStateFlow(UserPreferences())
     val prefs: StateFlow<UserPreferences> get() = _prefs
 
-    init {
-        loadUserPreferences()
-    }
+    private val _isLoaded = MutableStateFlow(false)
+    val isLoaded: StateFlow<Boolean> get() = _isLoaded
 
-    fun loadUserPreferences() {
+    init {
         viewModelScope.launch {
-            _prefs.value = repo.loadPreferences()
+            repo.ensureDocumentExists()
+            repo.listenPreferences().collect { loaded ->
+                _prefs.value = loaded
+                _isLoaded.value = true   // Ya tenemos datos se muestra UI
+            }
         }
     }
 
     fun setDarkTheme(value: Boolean) {
-        viewModelScope.launch {
-            repo.updateDarkTheme(value)
-            _prefs.value = _prefs.value.copy(darkTheme = value)
-        }
+        viewModelScope.launch { repo.updateDarkTheme(value) }
     }
 
     fun setLanguage(lang: String) {
-        viewModelScope.launch {
-            repo.updateLanguage(lang)
-            _prefs.value = _prefs.value.copy(language = lang)
-        }
+        viewModelScope.launch { repo.updateLanguage(lang) }
     }
 
     fun setPomodoro(minutes: Int) {
-        viewModelScope.launch {
-            repo.updatePomodoro(minutes)
-            _prefs.value = _prefs.value.copy(pomodoroMinutes = minutes)
-        }
+        viewModelScope.launch { repo.updatePomodoro(minutes) }
     }
 }
+
+
