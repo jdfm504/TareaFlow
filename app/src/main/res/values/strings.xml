@@ -107,6 +107,9 @@
     <string name="settings_profile_desc">Gestiona tu información de usuario</string>
     <string name="settings_profile_name">Nombre</string>
     <string name="profile_saved">Perfil actualizado</string>
+    <string name="password_updated">Contraseña actualizada correctamente</string>
+    <string name="no_changes">No hay cambios para guardar</string>
+
 
     <!-- Apariencia -->
     <string name="settings_section_appearance">Apariencia</string>

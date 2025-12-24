@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.campusdigitalfp.tareaflow.R
 import com.campusdigitalfp.tareaflow.data.UserProfileRepository
+import com.google.firebase.auth.EmailAuthProvider
+import kotlinx.coroutines.tasks.await
 
 sealed class AuthUiState {
     data object Idle : AuthUiState()
@@ -129,6 +131,43 @@ class AuthViewModel(
         viewModelScope.launch {
             val repo = UserProfileRepository()
             repo.updateName(name)
+        }
+    }
+
+    fun changePassword(
+        currentPassword: String,
+        newPassword: String,
+        onResult: (Boolean, Int?) -> Unit
+    ) {
+        val user = FirebaseAuth.getInstance().currentUser
+
+        // Si no hay usuario → error.
+        if (user == null) {
+            onResult(false, R.string.error_unknown)
+            return
+        }
+
+        val email = user.email
+        if (email.isNullOrBlank()) {
+            onResult(false, R.string.error_unknown)
+            return
+        }
+
+        val credential = EmailAuthProvider.getCredential(email, currentPassword)
+
+        viewModelScope.launch {
+            try {
+                // 1) Reautenticar usuario (necesario en FIrebase)
+                user.reauthenticate(credential).await()
+
+                // 2) Cambiar contraseña
+                user.updatePassword(newPassword).await()
+
+                onResult(true, null)
+
+            } catch (e: Exception) {
+                onResult(false, R.string.error_wrong_password)
+            }
         }
     }
 

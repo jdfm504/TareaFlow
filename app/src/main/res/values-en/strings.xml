@@ -96,6 +96,8 @@
     <string name="settings_profile_desc">Manage your user information</string>
     <string name="settings_profile_name">Name</string>
     <string name="profile_saved">Profile updated</string>
+    <string name="password_updated">Password updated successfully</string>
+    <string name="no_changes">No changes to save</string>
 
     <string name="settings_section_appearance">Appearance</string>
     <string name="settings_section_appearance_desc">Adjust the visual look of the application</string>

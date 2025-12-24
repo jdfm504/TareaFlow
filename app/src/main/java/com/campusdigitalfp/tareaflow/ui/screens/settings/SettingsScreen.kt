@@ -1,6 +1,5 @@
 package com.campusdigitalfp.tareaflow.ui.screens.settings
 
-import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -24,12 +23,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import android.widget.Toast
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.campusdigitalfp.tareaflow.R
 import com.campusdigitalfp.tareaflow.ui.theme.ApplyStatusBarTheme
 import com.campusdigitalfp.tareaflow.viewmodel.PreferencesViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.UserProfileViewModel
+import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 
 @Composable
 fun SettingsScreen(
@@ -38,15 +38,9 @@ fun SettingsScreen(
     prefsViewModel: PreferencesViewModel = viewModel()
 ) {
     val prefs by prefsViewModel.prefs.collectAsState()
-
     val context = LocalContext.current
-    val activity = context as? Activity
-
-    // Ajustar la status bar según el tema
-    val systemUiController = rememberSystemUiController()
-
-    val profileViewModel: UserProfileViewModel = viewModel()
     val profile by profileViewModel.profile.collectAsState()
+    val focusManager = LocalFocusManager.current
 
     ApplyStatusBarTheme()
 
@@ -56,6 +50,17 @@ fun SettingsScreen(
     var repeatPassword by rememberSaveable { mutableStateOf("") }
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
 
+    var tempPomodoro by rememberSaveable { mutableStateOf(prefs.pomodoroMinutes.toString()) }
+    var tempName by rememberSaveable { mutableStateOf("") }
+
+    // Cargar nombre al entrar
+    LaunchedEffect(profile.name) {
+        if (tempName.isEmpty()) tempName = profile.name
+    }
+    // Cargar pomodoro al entrar
+    LaunchedEffect(prefs.pomodoroMinutes) {
+        tempPomodoro = prefs.pomodoroMinutes.toString()
+    }
 
     Column(
         modifier = Modifier
@@ -85,12 +90,12 @@ fun SettingsScreen(
             )
         }
 
-        Divider(
-            color = MaterialTheme.colorScheme.primary,
-            thickness = 2.dp,
+        HorizontalDivider(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 18.dp)
+                .padding(vertical = 18.dp),
+            thickness = 2.dp,
+            color = MaterialTheme.colorScheme.primary
         )
 
         // ======================= NOMBRE USUARIO =======================
@@ -99,33 +104,12 @@ fun SettingsScreen(
             description = stringResource(R.string.settings_profile_desc)
         )
 
-        var tempName by rememberSaveable { mutableStateOf("") }
-
-        // POner el nombre en el campo de texto
-        LaunchedEffect(profile.name) {
-            if (tempName.isEmpty()) {
-                tempName = profile.name
-            }
-        }
-
         OutlinedTextField(
             value = tempName,
             onValueChange = { tempName = it },
             label = { Text(stringResource(R.string.settings_profile_name)) },
             modifier = Modifier.fillMaxWidth()
         )
-
-        Button(
-            onClick = {
-                profileViewModel.updateName(tempName)
-                Toast.makeText(context, R.string.profile_saved, Toast.LENGTH_SHORT).show()
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp)
-        ) {
-            Text(stringResource(R.string.save_button))
-        }
 
         SoftDivider()
 
@@ -154,10 +138,10 @@ fun SettingsScreen(
         )
 
         OutlinedTextField(
-            value = prefs.pomodoroMinutes.toString(),
+            value = tempPomodoro,
             onValueChange = { v ->
-                if (v.all { it.isDigit() } && v.isNotBlank()) {
-                    prefsViewModel.setPomodoro(v.toInt())
+                if (v.all { it.isDigit() }) {
+                    tempPomodoro = v
                 }
             },
             singleLine = true,
@@ -208,6 +192,99 @@ fun SettingsScreen(
         }
 
         Spacer(Modifier.height(40.dp))
+
+        // ======================= BOTÓN GUARDAR CAMBIOS    =======================
+
+        val authViewModel: AuthViewModel = viewModel()
+
+        // Función para guardar los cambios de perfil si no se requiere cambio de contraseña
+        fun guardarCambiosPerfil(): Boolean {
+            var cambios = false
+
+            if (tempName.isNotBlank() && tempName != profile.name) {
+                profileViewModel.updateName(tempName)
+                cambios = true
+            }
+
+            val p = tempPomodoro.toIntOrNull()
+            if (p != null && p != prefs.pomodoroMinutes) {
+                prefsViewModel.setPomodoro(p)
+                cambios = true
+            }
+
+            // Si hay cambios quitar el foco del cuadro de texto
+            if (cambios) {
+                focusManager.clearFocus()
+            }
+
+            return cambios
+        }
+
+        // Botón para guardar los cambios
+        Button(
+            onClick = {
+
+                val quiereCambiarPassword =
+                    currentPassword.isNotBlank() &&
+                            newPassword.isNotBlank() &&
+                            repeatPassword.isNotBlank()
+
+                if (quiereCambiarPassword) {
+
+                    if (newPassword != repeatPassword) {
+                        Toast.makeText(context, R.string.error_confirm_mismatch, Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+
+                    authViewModel.changePassword(
+                        currentPassword,
+                        newPassword
+                    ) { success, messageRes ->
+
+                        if (!success) {
+                            Toast.makeText(context, context.getString(messageRes!!), Toast.LENGTH_LONG).show()
+                            return@changePassword
+                        }
+
+                        // Contraseña cambiada
+                        Toast.makeText(context, R.string.password_updated, Toast.LENGTH_SHORT).show()
+
+                        currentPassword = ""
+                        newPassword = ""
+                        repeatPassword = ""
+
+                        //quitar foco del cuadro de texto
+                        focusManager.clearFocus()
+
+                        // Guardar cambios de nombre y pomodoro
+                        val otrosCambios = guardarCambiosPerfil()
+                    }
+                    return@Button
+                }
+
+                // guardar nombre y pomodoro aunque no se cambie contraseña
+                val cambios = guardarCambiosPerfil()
+
+                if (cambios) {
+                    Toast.makeText(context, R.string.profile_saved, Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, R.string.no_changes, Toast.LENGTH_SHORT).show()
+                }
+            }, modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            shape = RoundedCornerShape(18.dp)
+        )
+        {
+            Text(
+                text = stringResource(R.string.save_button),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(Modifier.height(12.dp))
+
 
         // ======================= BOTÓN BORRAR CUENTA =======================
         Button(
@@ -269,6 +346,7 @@ fun SettingsScreen(
 }
 
 // ======================= COMPONENTES =======================
+// Para las cabeceras de los apartados
 @Composable
 fun SectionHeader(title: String, description: String) {
     Column(
@@ -315,15 +393,16 @@ fun SimpleRow(
 
 @Composable
 fun SoftDivider() {
-    Divider(
-        color = MaterialTheme.colorScheme.outlineVariant,
-        thickness = 1.dp,
+    HorizontalDivider(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 12.dp, bottom = 24.dp)
+            .padding(top = 12.dp, bottom = 24.dp),
+        thickness = 1.dp,
+        color = MaterialTheme.colorScheme.outlineVariant
     )
 }
 
+// Switch para cambiar de tema
 @Composable
 fun ModernSwitch(
     checked: Boolean,
