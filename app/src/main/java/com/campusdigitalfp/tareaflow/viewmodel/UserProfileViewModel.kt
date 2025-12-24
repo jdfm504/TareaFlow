@@ -16,7 +16,11 @@ class UserProfileViewModel : ViewModel() {
     val profile: StateFlow<UserProfile> get() = _profile
 
     init {
-        loadProfile()
+        viewModelScope.launch {
+            repo.listenUserProfile().collect { data ->
+                _profile.value = data
+            }
+        }
     }
 
     fun loadProfile() {

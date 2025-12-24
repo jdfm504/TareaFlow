@@ -3,6 +3,9 @@ package com.campusdigitalfp.tareaflow.data
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.campusdigitalfp.tareaflow.data.model.UserProfile
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class UserProfileRepository {
@@ -39,5 +42,24 @@ class UserProfileRepository {
 
     suspend fun updateName(newName: String) {
         profileDocument()?.update("name", newName)?.await()
+    }
+
+    fun listenUserProfile(): Flow<UserProfile> = callbackFlow {
+
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+            ?: run { close(); return@callbackFlow }
+
+        val subscription = FirebaseFirestore.getInstance()
+            .collection("usuarios")
+            .document(uid)
+            .collection("perfil")
+            .document("app")
+            .addSnapshotListener { snap, _ ->
+                if (snap != null && snap.exists()) {
+                    trySend(snap.toObject(UserProfile::class.java) ?: UserProfile())
+                }
+            }
+
+        awaitClose { subscription.remove() }
     }
 }

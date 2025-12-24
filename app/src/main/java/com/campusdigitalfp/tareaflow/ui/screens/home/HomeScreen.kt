@@ -153,7 +153,7 @@ fun TaskGroup(
 fun HomeScreen(
     navController: NavController,
     viewModel: TaskViewModel,
-    onGoToSettings: () -> Unit = {},
+    profileViewModel: UserProfileViewModel,
     authViewModel: AuthViewModel = viewModel()
 ) {
     //LaunchedEffect(Unit) { viewModel.seed() } // Lista de prueba local
@@ -185,7 +185,6 @@ fun HomeScreen(
 
     val isAnonymous = FirebaseAuth.getInstance().currentUser?.isAnonymous == true
 
-    val profileViewModel: UserProfileViewModel = viewModel()
     val profile by profileViewModel.profile.collectAsState()
 
     Scaffold(
@@ -200,11 +199,6 @@ fun HomeScreen(
                         )
                     } else {
                         Text(stringResource(R.string.home_title))
-                        Text(
-                            text = "Hola, ${profile.name}",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -247,9 +241,17 @@ fun HomeScreen(
                             onDismissRequest = { menuExpanded = false }
                         ) {
                             DropdownMenuItem(
-                                text = { Text("👤 ${profile.name}") },
-                                onClick = {}
+                                text = {
+                                    Text(
+                                        profile.name,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                },
+                                onClick = {},
+                                enabled = false
                             )
+                            Divider()
 
                             DropdownMenuItem(
                                 leadingIcon = {

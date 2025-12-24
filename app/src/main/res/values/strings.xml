@@ -22,6 +22,7 @@
     <string name="tasks_pending">Pendientes</string>
     <string name="tasks_completed">Completadas</string>
     <string name="menu_upgrade_account">Crear cuenta</string>
+    <string name="home_greeting">Hola</string>
 
     <!-- Campos -->
     <string name="email_label">Correo electrónico</string>
@@ -105,6 +106,7 @@
     <string name="settings_profile_title">Perfil</string>
     <string name="settings_profile_desc">Gestiona tu información de usuario</string>
     <string name="settings_profile_name">Nombre</string>
+    <string name="profile_saved">Perfil actualizado</string>
 
     <!-- Apariencia -->
     <string name="settings_section_appearance">Apariencia</string>

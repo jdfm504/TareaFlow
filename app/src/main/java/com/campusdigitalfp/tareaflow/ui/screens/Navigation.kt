@@ -16,12 +16,14 @@ import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.TaskViewModel
 import com.campusdigitalfp.tareaflow.ui.screens.settings.SettingsScreen
 import kotlinx.coroutines.tasks.await
+import com.campusdigitalfp.tareaflow.viewmodel.UserProfileViewModel
 
 @Composable
 fun TareaFlowNavHost(
     navController: NavHostController,
     taskViewModel: TaskViewModel = viewModel(),
-    authViewModel: AuthViewModel = viewModel()
+    authViewModel: AuthViewModel = viewModel(),
+    profileViewModel: UserProfileViewModel
 ) {
     val auth = FirebaseAuth.getInstance()
 
@@ -87,7 +89,8 @@ fun TareaFlowNavHost(
                 HomeScreen(
                     navController = navController,
                     viewModel = taskViewModel,
-                    authViewModel = authViewModel
+                    authViewModel = authViewModel,
+                    profileViewModel = profileViewModel
                 )
             }
         }
@@ -112,7 +115,10 @@ fun TareaFlowNavHost(
         }
 
         composable("settings") {
-            SettingsScreen(navController)
+            SettingsScreen(
+                navController = navController,
+                profileViewModel = profileViewModel
+            )
         }
     }
 }

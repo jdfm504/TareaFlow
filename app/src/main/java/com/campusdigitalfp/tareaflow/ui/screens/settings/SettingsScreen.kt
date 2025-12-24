@@ -1,8 +1,6 @@
 package com.campusdigitalfp.tareaflow.ui.screens.settings
 
 import android.app.Activity
-import android.content.Intent
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -25,9 +23,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.core.os.LocaleListCompat
+import android.widget.Toast
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.campusdigitalfp.tareaflow.MainActivity
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.campusdigitalfp.tareaflow.R
 import com.campusdigitalfp.tareaflow.ui.theme.ApplyStatusBarTheme
@@ -37,6 +34,7 @@ import com.campusdigitalfp.tareaflow.viewmodel.UserProfileViewModel
 @Composable
 fun SettingsScreen(
     navController: NavController,
+    profileViewModel: UserProfileViewModel,
     prefsViewModel: PreferencesViewModel = viewModel()
 ) {
     val prefs by prefsViewModel.prefs.collectAsState()
@@ -101,14 +99,33 @@ fun SettingsScreen(
             description = stringResource(R.string.settings_profile_desc)
         )
 
+        var tempName by rememberSaveable { mutableStateOf("") }
+
+        // POner el nombre en el campo de texto
+        LaunchedEffect(profile.name) {
+            if (tempName.isEmpty()) {
+                tempName = profile.name
+            }
+        }
+
         OutlinedTextField(
-            value = profile.name,
-            onValueChange = { newValue ->
-                profileViewModel.updateName(newValue)
-            },
+            value = tempName,
+            onValueChange = { tempName = it },
             label = { Text(stringResource(R.string.settings_profile_name)) },
             modifier = Modifier.fillMaxWidth()
         )
+
+        Button(
+            onClick = {
+                profileViewModel.updateName(tempName)
+                Toast.makeText(context, R.string.profile_saved, Toast.LENGTH_SHORT).show()
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp)
+        ) {
+            Text(stringResource(R.string.save_button))
+        }
 
         SoftDivider()
 

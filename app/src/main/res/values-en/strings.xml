@@ -21,6 +21,7 @@
     <string name="tasks_pending">Pending</string>
     <string name="tasks_completed">Completed</string>
     <string name="menu_upgrade_account">Create account</string>
+    <string name="home_greeting">Hello</string>
 
     <string name="email_label">Email</string>
     <string name="password_label">Password</string>
@@ -94,6 +95,7 @@
     <string name="settings_profile_title">Profile</string>
     <string name="settings_profile_desc">Manage your user information</string>
     <string name="settings_profile_name">Name</string>
+    <string name="profile_saved">Profile updated</string>
 
     <string name="settings_section_appearance">Appearance</string>
     <string name="settings_section_appearance_desc">Adjust the visual look of the application</string>

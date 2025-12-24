@@ -12,6 +12,7 @@ import com.campusdigitalfp.tareaflow.ui.screens.login.TareaFlowNavHost
 import com.campusdigitalfp.tareaflow.ui.theme.TareaFlowTheme
 import com.campusdigitalfp.tareaflow.viewmodel.PreferencesViewModel
 import com.campusdigitalfp.tareaflow.ui.screens.loading.LoadingScreen
+import com.campusdigitalfp.tareaflow.viewmodel.UserProfileViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,9 +20,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             // Cargar preferencias de Firestore
             val prefsViewModel: PreferencesViewModel = viewModel()
-            val prefs by prefsViewModel.prefs.collectAsState()
 
+            val prefs by prefsViewModel.prefs.collectAsState()
             val isLoaded by prefsViewModel.isLoaded.collectAsState()
+            val profileViewModel: UserProfileViewModel = viewModel()
 
             // Mostrar pantalla de carga hasta tener las preferencias
             if (!isLoaded) {
@@ -34,7 +36,7 @@ class MainActivity : ComponentActivity() {
 
                 Surface {
                     val navController = rememberNavController()
-                    TareaFlowNavHost(navController)
+                    TareaFlowNavHost(navController, profileViewModel = profileViewModel)
                 }
             }
         }
