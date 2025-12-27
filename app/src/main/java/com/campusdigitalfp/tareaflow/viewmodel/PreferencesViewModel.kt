@@ -45,6 +45,19 @@ class PreferencesViewModel : ViewModel() {
     fun setPomodoro(minutes: Int) {
         viewModelScope.launch { repo.updatePomodoro(minutes) }
     }
+
+    fun setShortBreak(minutes: Int) {
+        viewModelScope.launch { repo.updateShortBreak(minutes) }
+    }
+
+    fun setLongBreak(minutes: Int) {
+        viewModelScope.launch { repo.updateLongBreak(minutes) }
+    }
+
+    fun setCycles(count: Int) {
+        viewModelScope.launch { repo.updateCycles(count) }
+    }
+
     // Función auxiliar: espera a que FirebaseAuth tenga usuario
     suspend fun waitForUserAuthenticated() {
         val auth = FirebaseAuth.getInstance()

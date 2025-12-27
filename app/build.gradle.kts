@@ -70,6 +70,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.core:core:1.12.0")
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.foundation)
 
     testImplementation(libs.junit)
 

@@ -12,6 +12,7 @@ import com.campusdigitalfp.tareaflow.ui.screens.home.HomeScreen
 import com.campusdigitalfp.tareaflow.ui.screens.register.RegisterScreen
 import com.google.firebase.auth.FirebaseAuth
 import com.campusdigitalfp.tareaflow.ui.screens.home.TaskEditScreen
+import com.campusdigitalfp.tareaflow.ui.screens.pomodoro.PomodoroScreen
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.TaskViewModel
 import com.campusdigitalfp.tareaflow.ui.screens.settings.SettingsScreen
@@ -137,6 +138,14 @@ fun TareaFlowNavHost(
             SettingsScreen(
                 navController = navController,
                 profileViewModel = profileViewModel
+            )
+        }
+
+        // ============ POMODORO ============
+        composable("pomodoro") {
+            PomodoroScreen(
+                navController = navController,
+                prefsViewModel = prefsViewModel
             )
         }
     }

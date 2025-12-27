@@ -3,6 +3,7 @@ package com.campusdigitalfp.tareaflow.data
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.campusdigitalfp.tareaflow.data.model.UserPreferences
+import com.google.firebase.firestore.DocumentReference
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -13,13 +14,15 @@ class PreferencesRepository {
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
 
-    private fun preferencesDocument() =
-        auth.currentUser?.let { user ->
-            db.collection("usuarios")
-                .document(user.uid)
-                .collection("preferences")
-                .document("app")
-        }
+    private fun preferencesDocument(): DocumentReference {
+        val user = auth.currentUser
+            ?: throw IllegalStateException("User not authenticated")
+
+        return db.collection("usuarios")
+            .document(user.uid)
+            .collection("preferences")
+            .document("app")
+    }
 
     // ---------------------------
     // LISTENER EN TIEMPO REAL
@@ -69,6 +72,18 @@ class PreferencesRepository {
     }
 
     suspend fun updatePomodoro(minutes: Int) {
-        preferencesDocument()?.update("pomodoroMinutes", minutes)?.await()
+        preferencesDocument().update("pomodoroMinutes", minutes).await()
+    }
+
+    suspend fun updateShortBreak(value: Int) {
+        preferencesDocument().update("shortBreakMinutes", value).await()
+    }
+
+    suspend fun updateLongBreak(value: Int) {
+        preferencesDocument().update("longBreakMinutes", value).await()
+    }
+
+    suspend fun updateCycles(value: Int) {
+        preferencesDocument().update("cyclesUntilLongBreak", value).await()
     }
 }

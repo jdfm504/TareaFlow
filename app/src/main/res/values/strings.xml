@@ -145,4 +145,10 @@
     <string name="account_deleted">Tu cuenta ha sido eliminada</string>
     <string name="error_session_invalid">Sesión inválida</string>
 
+    <!-- Pomodoro -->
+    <string name="settings_pomodoro_focus">Concentración (min)</string>
+    <string name="settings_pomodoro_short_break">Descanso corto (min)</string>
+    <string name="settings_pomodoro_long_break">Descanso largo (min)</string>
+    <string name="settings_pomodoro_cycles">Ciclos hasta descanso largo</string>
+
 </resources>

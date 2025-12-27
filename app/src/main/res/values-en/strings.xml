@@ -129,4 +129,9 @@
     <string name="account_deleted">Your account has been deleted</string>
     <string name="error_session_invalid">Invalid session</string>
 
+    <string name="settings_pomodoro_focus">Focus time (min)</string>
+    <string name="settings_pomodoro_short_break">Short break (min)</string>
+    <string name="settings_pomodoro_long_break">Long break (min)</string>
+    <string name="settings_pomodoro_cycles">Cycles until long break</string>
+
 </resources>

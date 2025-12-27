@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -337,6 +338,18 @@ fun HomeScreen(
                                     navController.navigate("settings")
                                 }
                             )
+
+                            DropdownMenuItem(
+                                leadingIcon = {
+                                    Icon(Icons.Outlined.Timer, null, tint = MaterialTheme.colorScheme.primary)
+                                },
+                                text = { Text("Pomodoro") },
+                                onClick = {
+                                    menuExpanded = false
+                                    navController.navigate("pomodoro")
+                                }
+                            )
+
                             DropdownMenuItem(
                                 leadingIcon = {
                                     Icon(Icons.Filled.Info, null, tint = MaterialTheme.colorScheme.primary)

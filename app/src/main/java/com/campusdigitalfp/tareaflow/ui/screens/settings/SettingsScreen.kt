@@ -33,6 +33,7 @@ import com.campusdigitalfp.tareaflow.viewmodel.UserProfileViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlin.text.clear
+import kotlin.toString
 
 @Composable
 fun SettingsScreen(
@@ -54,6 +55,10 @@ fun SettingsScreen(
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
 
     var tempPomodoro by rememberSaveable { mutableStateOf(prefs.pomodoroMinutes.toString()) }
+    var tempShortBreak by rememberSaveable { mutableStateOf(prefs.shortBreakMinutes.toString()) }
+    var tempLongBreak by rememberSaveable { mutableStateOf(prefs.longBreakMinutes.toString()) }
+    var tempCycles by rememberSaveable { mutableStateOf(prefs.cyclesUntilLongBreak.toString()) }
+
     var tempName by rememberSaveable { mutableStateOf("") }
 
     val isAnonymous = FirebaseAuth.getInstance().currentUser?.isAnonymous == true
@@ -63,8 +68,17 @@ fun SettingsScreen(
         if (tempName.isEmpty()) tempName = profile.name
     }
     // Cargar pomodoro al entrar
-    LaunchedEffect(prefs.pomodoroMinutes) {
+    LaunchedEffect(
+        prefs.pomodoroMinutes,
+        prefs.shortBreakMinutes,
+        prefs.longBreakMinutes,
+        prefs.cyclesUntilLongBreak
+    )
+    {
         tempPomodoro = prefs.pomodoroMinutes.toString()
+        tempShortBreak = prefs.shortBreakMinutes.toString()
+        tempLongBreak = prefs.longBreakMinutes.toString()
+        tempCycles = prefs.cyclesUntilLongBreak.toString()
     }
 
     Column(
@@ -153,17 +167,44 @@ fun SettingsScreen(
             description = stringResource(R.string.settings_section_pomodoro_desc)
         )
 
+        Spacer(Modifier.height(8.dp))
+
         OutlinedTextField(
             value = tempPomodoro,
-            onValueChange = { v ->
-                if (v.all { it.isDigit() }) {
-                    tempPomodoro = v
-                }
-            },
+            onValueChange = { tempPomodoro = it },
+            label = { Text(stringResource(R.string.settings_pomodoro_focus)) },
             singleLine = true,
-            modifier = Modifier.width(120.dp),
-            shape = RoundedCornerShape(14.dp),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = tempShortBreak,
+            onValueChange = { tempShortBreak = it },
+            label = { Text(stringResource(R.string.settings_pomodoro_short_break)) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = tempLongBreak,
+            onValueChange = { tempLongBreak = it },
+            label = { Text(stringResource(R.string.settings_pomodoro_long_break)) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = tempCycles,
+            onValueChange = { tempCycles = it },
+            label = { Text(stringResource(R.string.settings_pomodoro_cycles)) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
         )
 
         SoftDivider()
@@ -247,6 +288,24 @@ fun SettingsScreen(
             val p = tempPomodoro.toIntOrNull()
             if (p != null && p != prefs.pomodoroMinutes) {
                 prefsViewModel.setPomodoro(p)
+                cambios = true
+            }
+
+            val sb = tempShortBreak.toIntOrNull()
+            if (sb != null && sb != prefs.shortBreakMinutes) {
+                prefsViewModel.setShortBreak(sb)
+                cambios = true
+            }
+
+            val lb = tempLongBreak.toIntOrNull()
+            if (lb != null && lb != prefs.longBreakMinutes) {
+                prefsViewModel.setLongBreak(lb)
+                cambios = true
+            }
+
+            val cycles = tempCycles.toIntOrNull()
+            if (cycles != null && cycles != prefs.cyclesUntilLongBreak) {
+                prefsViewModel.setCycles(cycles)
                 cambios = true
             }
 
