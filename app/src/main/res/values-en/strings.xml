@@ -133,5 +133,6 @@
     <string name="settings_pomodoro_short_break">Short break (min)</string>
     <string name="settings_pomodoro_long_break">Long break (min)</string>
     <string name="settings_pomodoro_cycles">Cycles until long break</string>
+    <string name="menu_pomodoro">Pomodoro</string>
 
 </resources>

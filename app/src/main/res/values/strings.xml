@@ -150,5 +150,6 @@
     <string name="settings_pomodoro_short_break">Descanso corto (min)</string>
     <string name="settings_pomodoro_long_break">Descanso largo (min)</string>
     <string name="settings_pomodoro_cycles">Ciclos hasta descanso largo</string>
+    <string name="menu_pomodoro">Pomodoro</string>
 
 </resources>

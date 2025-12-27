@@ -343,7 +343,7 @@ fun HomeScreen(
                                 leadingIcon = {
                                     Icon(Icons.Outlined.Timer, null, tint = MaterialTheme.colorScheme.primary)
                                 },
-                                text = { Text("Pomodoro") },
+                                text = { Text(stringResource(R.string.menu_pomodoro)) },
                                 onClick = {
                                     menuExpanded = false
                                     navController.navigate("pomodoro")
