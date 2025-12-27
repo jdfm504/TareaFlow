@@ -1,11 +1,15 @@
 package com.campusdigitalfp.tareaflow.ui.screens.pomodoro
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.rounded.Bedtime
+import androidx.compose.material.icons.rounded.Coffee
+import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.campusdigitalfp.tareaflow.viewmodel.PreferencesViewModel
 import kotlinx.coroutines.*
+import kotlin.times
 
 
 enum class PomodoroMode { SIMPLE, POMODORO }
@@ -67,6 +72,19 @@ fun PomodoroScreen(
         timeText = String.format("%02d:%02d", remainingSeconds / 60, remainingSeconds % 60)
     }
 
+    // Color segun la fase del pomodoro
+    val phaseColor = when (phase) {
+        PomodoroPhase.FOCUS -> Color(0xFFE53935)        // rojo
+        PomodoroPhase.SHORT_BREAK -> Color(0xFF42A5F5)  // azul
+        PomodoroPhase.LONG_BREAK -> Color(0xFF66BB6A)   // verde
+    }
+
+    val phaseIcon = when (phase) {
+        PomodoroPhase.FOCUS -> Icons.Rounded.Timer
+        PomodoroPhase.SHORT_BREAK -> Icons.Rounded.Coffee
+        PomodoroPhase.LONG_BREAK -> Icons.Rounded.Bedtime
+    }
+
     //  cambio de fase
     fun nextPhase() {
         when (phase) {
@@ -99,8 +117,11 @@ fun PomodoroScreen(
             }
             timerJob = null
             isRunning = false
-            nextPhase()
-            startTimer()
+
+            if (mode == PomodoroMode.POMODORO) {
+                nextPhase()
+                startTimer()
+            }
         }
     }
 
@@ -111,8 +132,20 @@ fun PomodoroScreen(
     }
 
     fun resetTimer() {
+        pauseTimer()                         // detener
+        phase = PomodoroPhase.FOCUS          // volver a foco
+        cycleCount = 0                       // reiniciar ciclos
+        remainingSeconds = prefs.pomodoroMinutes * 60  // tiempo inicial
+    }
+
+    @SuppressLint("DefaultLocale")
+    fun resetSimple() {
         pauseTimer()
-        remainingSeconds = initialSeconds()
+        remainingSeconds = prefs.pomodoroMinutes * 60
+        timeText = String.format(
+            "%02d:%02d", remainingSeconds / 60, remainingSeconds % 60
+        )
+        progress = 1f
     }
 
     Scaffold(
@@ -135,9 +168,28 @@ fun PomodoroScreen(
                 .padding(16.dp)
         ) {
 
+            Icon(
+                imageVector = phaseIcon,
+                contentDescription = null,
+                tint = phaseColor,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentWidth(Alignment.CenterHorizontally)
+                    .size(60.dp)
+            )
+
             PomodoroModeSelector(
                 selected = mode,
-                onChange = { mode = it }
+                onChange = { newMode ->
+                    mode = newMode
+                    pauseTimer()
+
+                    phase = PomodoroPhase.FOCUS
+                    cycleCount = 0
+                    remainingSeconds = prefs.pomodoroMinutes * 60
+                    progress = 1f
+                    timeText = String.format("%02d:%02d", prefs.pomodoroMinutes, 0)
+                }
             )
 
             Spacer(Modifier.height(20.dp))
@@ -151,6 +203,7 @@ fun PomodoroScreen(
                 CircularTimer(
                     progress = progress,
                     timeText = timeText,
+                    ringColor = phaseColor,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
 
@@ -160,7 +213,7 @@ fun PomodoroScreen(
                     isRunning = isRunning,
                     onStart = { startTimer() },
                     onPause = { pauseTimer() },
-                    onReset = { resetTimer() }
+                    onReset = { resetSimple() }
                 )
             }
 
@@ -188,6 +241,7 @@ fun PomodoroScreen(
                 CircularTimer(
                     progress = progress,
                     timeText = timeText,
+                    ringColor = phaseColor,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
 

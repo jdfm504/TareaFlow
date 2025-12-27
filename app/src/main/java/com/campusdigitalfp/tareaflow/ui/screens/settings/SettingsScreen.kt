@@ -171,37 +171,76 @@ fun SettingsScreen(
 
         OutlinedTextField(
             value = tempPomodoro,
-            onValueChange = { tempPomodoro = it },
+            onValueChange = { nuevo ->
+                if (nuevo.all { it.isDigit() }) {  // solo números
+                    if (nuevo.isBlank()) {
+                        tempPomodoro = ""          // permitir borrar temporalmente
+                    } else {
+                        val n = nuevo.toInt()
+                        if (n >= 1) tempPomodoro = nuevo  // impedir 0
+                    }
+                }
+            },
             label = { Text(stringResource(R.string.settings_pomodoro_focus)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
 
+
         Spacer(Modifier.height(12.dp))
 
         OutlinedTextField(
             value = tempShortBreak,
-            onValueChange = { tempShortBreak = it },
+            onValueChange = { nuevo ->
+                if (nuevo.all { it.isDigit() }) {
+                    if (nuevo.isBlank()) {
+                        tempShortBreak = ""
+                    } else {
+                        val n = nuevo.toInt()
+                        if (n >= 1) tempShortBreak = nuevo
+                    }
+                }
+            },
             label = { Text(stringResource(R.string.settings_pomodoro_short_break)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
 
+
         Spacer(Modifier.height(12.dp))
 
         OutlinedTextField(
             value = tempLongBreak,
-            onValueChange = { tempLongBreak = it },
+            onValueChange = { nuevo ->
+                if (nuevo.all { it.isDigit() }) {
+                    if (nuevo.isBlank()) {
+                        tempLongBreak = ""
+                    } else {
+                        val n = nuevo.toInt()
+                        if (n >= 1) tempLongBreak = nuevo
+                    }
+                }
+            },
             label = { Text(stringResource(R.string.settings_pomodoro_long_break)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
 
+
         Spacer(Modifier.height(12.dp))
 
         OutlinedTextField(
             value = tempCycles,
-            onValueChange = { tempCycles = it },
+            onValueChange = { nuevo ->
+                if (nuevo.all { it.isDigit() }) {
+                    if (nuevo.isBlank()) {
+                        tempCycles = ""
+                    } else {
+                        val n = nuevo.toInt()
+                        if (n >= 1) tempCycles = nuevo
+                    }
+                }
+            },
             label = { Text(stringResource(R.string.settings_pomodoro_cycles)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
@@ -285,26 +324,32 @@ fun SettingsScreen(
             }
 
             //  cambio de tiempo pomodoro permitido para todos
-            val p = tempPomodoro.toIntOrNull()
-            if (p != null && p != prefs.pomodoroMinutes) {
+            // Validar que el tiempo es >1 siempre
+            fun safeInt(value: String, defaultValue: Int): Int {
+                val n = value.toIntOrNull()
+                return if (n == null || n < 1) defaultValue else n
+            }
+
+            val p = safeInt(tempPomodoro, prefs.pomodoroMinutes)
+            if (p != prefs.pomodoroMinutes) {
                 prefsViewModel.setPomodoro(p)
                 cambios = true
             }
 
-            val sb = tempShortBreak.toIntOrNull()
-            if (sb != null && sb != prefs.shortBreakMinutes) {
+            val sb = safeInt(tempShortBreak, prefs.shortBreakMinutes)
+            if (sb != prefs.shortBreakMinutes) {
                 prefsViewModel.setShortBreak(sb)
                 cambios = true
             }
 
-            val lb = tempLongBreak.toIntOrNull()
-            if (lb != null && lb != prefs.longBreakMinutes) {
+            val lb = safeInt(tempLongBreak, prefs.longBreakMinutes)
+            if (lb != prefs.longBreakMinutes) {
                 prefsViewModel.setLongBreak(lb)
                 cambios = true
             }
 
-            val cycles = tempCycles.toIntOrNull()
-            if (cycles != null && cycles != prefs.cyclesUntilLongBreak) {
+            val cycles = safeInt(tempCycles, prefs.cyclesUntilLongBreak)
+            if (cycles != prefs.cyclesUntilLongBreak) {
                 prefsViewModel.setCycles(cycles)
                 cambios = true
             }

@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
@@ -18,10 +19,10 @@ import androidx.compose.ui.unit.sp
 fun CircularTimer(
     progress: Float,
     timeText: String,
+    ringColor: Color,
     modifier: Modifier = Modifier
 ) {
     val baseColor = MaterialTheme.colorScheme.surfaceVariant
-    val progressColor = MaterialTheme.colorScheme.primary
     val textColor = MaterialTheme.colorScheme.onBackground
 
     Box(
@@ -33,6 +34,7 @@ fun CircularTimer(
 
             val stroke = 20f
 
+            // Círculo base
             drawArc(
                 color = baseColor,
                 startAngle = -90f,
@@ -42,7 +44,7 @@ fun CircularTimer(
             )
 
             drawArc(
-                color = progressColor,
+                color = ringColor,
                 startAngle = -90f,
                 sweepAngle = progress * 360f,
                 useCenter = false,
