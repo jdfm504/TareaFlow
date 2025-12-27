@@ -93,6 +93,7 @@
     <string name="sending_email">Enviando…</string>
     <string name="forgot_password">¿Has olvidado tu contraseña?</string>
     <string name="login_anonymous">Entrar sin registrarse</string>
+    <string name="guest_user">Invitado</string>
 
     <!-- SettingsScreen -->
     <string name="settings_title">Configuración</string>
@@ -110,6 +111,8 @@
     <string name="password_updated">Contraseña actualizada correctamente</string>
     <string name="no_changes">No hay cambios para guardar</string>
     <string name="error_reauth_required">Debes iniciar sesión de nuevo para borrar la cuenta.</string>
+    <string name="settings_name_disabled">Regístrate para poder cambiar tu nombre.</string>
+    <string name="settings_password_disabled">Regístrate para poder cambiar tu contraseña.</string>
 
     <!-- Apariencia -->
     <string name="settings_section_appearance">Apariencia</string>

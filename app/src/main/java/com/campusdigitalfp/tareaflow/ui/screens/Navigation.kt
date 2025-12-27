@@ -61,9 +61,12 @@ fun TareaFlowNavHost(
 
         // ============ LOGIN ============
         composable("login") {
+            val prefsViewModel: PreferencesViewModel = viewModel()
+
             LoginScreen(
                 onLoginSuccess = {
-                    taskViewModel.startListeningToTasks()
+                    profileViewModel.reload()
+                    prefsViewModel.reload()
                     navController.navigate("home") {
                         popUpTo(0) { inclusive = true }
                     }

@@ -13,15 +13,17 @@ fun ProtectedRoute(
     val auth = FirebaseAuth.getInstance()
     val user = auth.currentUser
 
-    if (user != null) {
-        // Usuario autenticado, mostramos el contenido
-        content()
-    } else {
-        // Usuario no autenticado, vamos al login
-        LaunchedEffect(Unit) {
+    // Si NO hay usuario redirige a login, corrige fallo de recomposición de Home
+    LaunchedEffect(user) {
+        if (user == null) {
             navController.navigate("login") {
-                popUpTo("home") { inclusive = true }
+                popUpTo(0) { inclusive = true }
             }
         }
+    }
+
+    // Si hay usuario, mostrar contenido protegido
+    if (user != null) {
+        content()
     }
 }

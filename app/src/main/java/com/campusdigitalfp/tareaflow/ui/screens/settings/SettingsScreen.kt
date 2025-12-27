@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.campusdigitalfp.tareaflow.R
@@ -31,6 +32,7 @@ import com.campusdigitalfp.tareaflow.viewmodel.PreferencesViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.UserProfileViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import com.google.firebase.auth.FirebaseAuth
+import kotlin.text.clear
 
 @Composable
 fun SettingsScreen(
@@ -53,6 +55,8 @@ fun SettingsScreen(
 
     var tempPomodoro by rememberSaveable { mutableStateOf(prefs.pomodoroMinutes.toString()) }
     var tempName by rememberSaveable { mutableStateOf("") }
+
+    val isAnonymous = FirebaseAuth.getInstance().currentUser?.isAnonymous == true
 
     // Cargar nombre al entrar
     LaunchedEffect(profile.name) {
@@ -109,8 +113,19 @@ fun SettingsScreen(
             value = tempName,
             onValueChange = { tempName = it },
             label = { Text(stringResource(R.string.settings_profile_name)) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isAnonymous   // desactivado si es anónimo
         )
+        if (isAnonymous) {
+            Text(
+                text = stringResource(R.string.settings_name_disabled),
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier
+                    .padding(top = 6.dp)
+                    .clickable { navController.navigate("register") },
+                fontWeight = FontWeight.SemiBold
+            )
+        }
 
         SoftDivider()
 
@@ -159,37 +174,50 @@ fun SettingsScreen(
             description = stringResource(R.string.settings_section_password_desc)
         )
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(20.dp))
-                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp))
-                .padding(18.dp)
-        ) {
-            OutlinedTextField(
-                value = currentPassword,
-                onValueChange = { currentPassword = it },
-                label = { Text(stringResource(R.string.settings_password_current)) },
-                modifier = Modifier.fillMaxWidth()
+        if (isAnonymous) {
+            Text(
+                text = stringResource(R.string.settings_password_disabled),
+                color = MaterialTheme.colorScheme.error,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(vertical = 12.dp)
             )
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(20.dp))
+                    .border(
+                        1.dp,
+                        MaterialTheme.colorScheme.outlineVariant,
+                        RoundedCornerShape(20.dp)
+                    )
+                    .padding(18.dp)
+            ) {
+                OutlinedTextField(
+                    value = currentPassword,
+                    onValueChange = { currentPassword = it },
+                    label = { Text(stringResource(R.string.settings_password_current)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            Spacer(Modifier.height(14.dp))
+                Spacer(Modifier.height(14.dp))
 
-            OutlinedTextField(
-                value = newPassword,
-                onValueChange = { newPassword = it },
-                label = { Text(stringResource(R.string.settings_password_new)) },
-                modifier = Modifier.fillMaxWidth()
-            )
+                OutlinedTextField(
+                    value = newPassword,
+                    onValueChange = { newPassword = it },
+                    label = { Text(stringResource(R.string.settings_password_new)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            Spacer(Modifier.height(14.dp))
+                Spacer(Modifier.height(14.dp))
 
-            OutlinedTextField(
-                value = repeatPassword,
-                onValueChange = { repeatPassword = it },
-                label = { Text(stringResource(R.string.settings_password_repeat)) },
-                modifier = Modifier.fillMaxWidth()
-            )
+                OutlinedTextField(
+                    value = repeatPassword,
+                    onValueChange = { repeatPassword = it },
+                    label = { Text(stringResource(R.string.settings_password_repeat)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
 
         Spacer(Modifier.height(40.dp))
@@ -198,15 +226,24 @@ fun SettingsScreen(
 
         val authViewModel: AuthViewModel = viewModel()
 
-        // Función para guardar los cambios de perfil si no se requiere cambio de contraseña
+        // Función para guardar los cambios de perfil si no se requiere cambio de contraseña y controlando que no sea un anonimo el que intenta realizar cambios
         fun guardarCambiosPerfil(): Boolean {
             var cambios = false
 
-            if (tempName.isNotBlank() && tempName != profile.name) {
-                profileViewModel.updateName(tempName)
-                cambios = true
+            val isAnonymous = FirebaseAuth.getInstance().currentUser?.isAnonymous == true
+
+            // ----- cambio de nombre -----
+            if (!isAnonymous) {
+                if (tempName.isNotBlank() && tempName != profile.name) {
+                    profileViewModel.updateName(tempName)
+                    cambios = true
+                }
+            } else {
+                // Si el usuario es anónimo NO guardar nombre
+                // Pero permitimos pomodoro
             }
 
+            //  cambio de tiempo pomodoro permitido para todos
             val p = tempPomodoro.toIntOrNull()
             if (p != null && p != prefs.pomodoroMinutes) {
                 prefsViewModel.setPomodoro(p)
@@ -224,6 +261,19 @@ fun SettingsScreen(
         // Botón para guardar los cambios
         Button(
             onClick = {
+                val isAnonymous = FirebaseAuth.getInstance().currentUser?.isAnonymous == true
+
+                // Si es anónimo no puede cambiar contraseña ni nombre
+                if (isAnonymous) {
+                    val cambios = guardarCambiosPerfil()
+
+                    if (cambios) {
+                        Toast.makeText(context, R.string.profile_saved, Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, R.string.no_changes, Toast.LENGTH_SHORT).show()
+                    }
+                    return@Button
+                }
 
                 val quiereCambiarPassword =
                     currentPassword.isNotBlank() &&
@@ -328,6 +378,8 @@ fun SettingsScreen(
             },
             confirmButton = {
                 val authViewModel: AuthViewModel = viewModel()
+                val profileViewModel: UserProfileViewModel = viewModel()
+                val prefsViewModel: PreferencesViewModel = viewModel()
 
                 TextButton(onClick = {
                     showDeleteDialog = false
@@ -347,6 +399,8 @@ fun SettingsScreen(
                             ).show()
 
                             FirebaseAuth.getInstance().signOut()
+                            profileViewModel.clear()
+                            prefsViewModel.clear()
 
                             navController.navigate("onboarding") {
                                 popUpTo(0)

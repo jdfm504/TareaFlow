@@ -202,21 +202,29 @@ fun HomeScreen(
         val auth = FirebaseAuth.getInstance()
         val user = auth.currentUser
 
-        if (user != null) {
-            try {
-                user.reload().await()
-            } catch (e: Exception) {
-                // Usuario inválido → cerramos sesión y mandamos a login
-                authViewModel.logout()
-                Toast.makeText(
-                    context,
-                    R.string.error_session_invalid,
-                    Toast.LENGTH_LONG
-                ).show()
+        // Si algo provoca que Home se monta sin usuario forzar salida
+        if (user == null) {
+            navController.navigate("login") {
+                popUpTo(0) { inclusive = true }
+            }
+            return@LaunchedEffect
+        }
 
-                navController.navigate("login") {
-                    popUpTo(0) { inclusive = true }
-                }
+        try {
+            user.reload().await()
+        } catch (e: Exception) {
+            // Usuario eliminado o inválido entonces cerrar sesión y navegar a login
+            auth.signOut()
+            authViewModel.logout()
+
+            Toast.makeText(
+                context,
+                R.string.error_session_invalid,
+                Toast.LENGTH_LONG
+            ).show()
+
+            navController.navigate("login") {
+                popUpTo(0) { inclusive = true }
             }
         }
     }
@@ -285,7 +293,11 @@ fun HomeScreen(
                                 onClick = {},
                                 enabled = false
                             )
-                            Divider()
+                            HorizontalDivider(
+                                Modifier,
+                                DividerDefaults.Thickness,
+                                DividerDefaults.color
+                            )
 
                             DropdownMenuItem(
                                 leadingIcon = {

@@ -83,6 +83,7 @@
     <string name="sending_email">Sending…</string>
     <string name="forgot_password">Forgot your password?</string>
     <string name="login_anonymous">Login without registering</string>
+    <string name="guest_user">Guest</string>
 
     <string name="settings_title">Settings</string>
     <string name="settings_language_dialog_title">Change language</string>
@@ -99,6 +100,8 @@
     <string name="password_updated">Password updated successfully</string>
     <string name="no_changes">No changes to save</string>
     <string name="error_reauth_required">You must sign in again to delete the account.</string>
+    <string name="settings_name_disabled">Register to change your name.</string>
+    <string name="settings_password_disabled">Register to change your password.</string>
 
     <string name="settings_section_appearance">Appearance</string>
     <string name="settings_section_appearance_desc">Adjust the visual look of the application</string>

@@ -71,5 +71,10 @@ class PreferencesViewModel : ViewModel() {
             }
         }
     }
+
+    fun clear() {
+        _prefs.value = UserPreferences()
+        _isLoaded.value = false
+    }
 }
 

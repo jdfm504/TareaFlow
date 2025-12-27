@@ -126,6 +126,18 @@ class AuthViewModel(
         viewModelScope.launch {
             try {
                 repo.loginAnonymously()
+
+                // Si es anónimo, en Firestore creo un perfil inicial por defecto
+                val anon = FirebaseAuth.getInstance().currentUser
+                if (anon != null) {
+                    val repoProfile = UserProfileRepository()
+                    repoProfile.createInitialProfile(
+                        name = "Invitado",
+                        email = "",
+                        createdAt = System.currentTimeMillis()
+                    )
+                }
+
                 _state.value = AuthUiState.Success
                 onSuccess()
             } catch (e: Exception) {
@@ -216,13 +228,20 @@ class AuthViewModel(
 
         viewModelScope.launch {
             try {
-                // Borrar datos en Firestore
+                // Borrar datos en Firestore para el usuario
                 val uid = user.uid
-                // borrar todas las colecciones del usuario
-                deleteUserData(uid)
-                // borrar usuario de auth
-                user.delete().await()
+                // Si el usuario es anónimo no hay usuario que borrar
+                if (user.isAnonymous) {
+                    // Solo borrar los datos de Firestore
+                    deleteUserData(uid)
+                    // devolver éxito
+                    onResult(true, null)
+                    return@launch
+                }
 
+                // Usuario registrado
+                deleteUserData(uid)
+                user.delete().await()
                 onResult(true, null)
 
             } catch (e: Exception) {

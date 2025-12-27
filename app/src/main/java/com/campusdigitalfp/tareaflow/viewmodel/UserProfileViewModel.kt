@@ -42,4 +42,8 @@ class UserProfileViewModel : ViewModel() {
             _profile.value = profile
         }
     }
+
+    fun clear() {
+        _profile.value = UserProfile()
+    }
 }
