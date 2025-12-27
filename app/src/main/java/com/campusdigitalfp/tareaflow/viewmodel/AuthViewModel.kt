@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import com.campusdigitalfp.tareaflow.R
 import com.campusdigitalfp.tareaflow.data.UserProfileRepository
 import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
 sealed class AuthUiState {
@@ -26,7 +27,7 @@ class AuthViewModel(
     private val _state = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
     val state: StateFlow<AuthUiState> = _state
 
-    fun register(email: String, password: String, onSuccess: () -> Unit) {
+    fun register(email: String, password: String, name: String, onSuccess: () -> Unit) {
         _state.value = AuthUiState.Loading
 
         viewModelScope.launch {
@@ -40,6 +41,12 @@ class AuthViewModel(
                     // Caso 2: registro normal
                     repo.register(email, password)
                 }
+                // Ahora que el usuario YA está creado, obtener su UID y su email
+                val user = FirebaseAuth.getInstance().currentUser
+                val finalEmail = user?.email ?: ""
+
+                // Crear perfil inicial con nombre + email + fecha
+                createInitialUserProfile(name, finalEmail)
 
                 _state.value = AuthUiState.Success
                 onSuccess()
@@ -134,6 +141,16 @@ class AuthViewModel(
         }
     }
 
+    private suspend fun createInitialUserProfile(name: String, email: String) {
+        val repo = UserProfileRepository()
+
+        repo.createInitialProfile(
+            name = name,
+            email = email,
+            createdAt = System.currentTimeMillis()
+        )
+    }
+
     fun changePassword(
         currentPassword: String,
         newPassword: String,
@@ -171,4 +188,51 @@ class AuthViewModel(
         }
     }
 
+    private suspend fun deleteUserData(uid: String) {
+        val db = FirebaseFirestore.getInstance()
+
+        val userDoc = db.collection("usuarios").document(uid)
+
+        val subcollections = listOf("tareas", "perfil", "preferences")
+
+        // Borrar documentos dentro de cada subcolección
+        for (sub in subcollections) {
+            val col = userDoc.collection(sub).get().await()
+            for (doc in col.documents) {
+                doc.reference.delete().await()
+            }
+        }
+
+        // Finalmente, borrar el documento principal del usuario
+        userDoc.delete().await()
+    }
+
+
+    fun deleteAccount(onResult: (Boolean, Int?) -> Unit) {
+        val user = FirebaseAuth.getInstance().currentUser ?: run {
+            onResult(false, R.string.error_unknown)
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                // Borrar datos en Firestore
+                val uid = user.uid
+                // borrar todas las colecciones del usuario
+                deleteUserData(uid)
+                // borrar usuario de auth
+                user.delete().await()
+
+                onResult(true, null)
+
+            } catch (e: Exception) {
+                val msg = if ("recent authentication" in (e.message ?: "")) {
+                    R.string.error_reauth_required
+                } else {
+                    R.string.error_unknown
+                }
+                onResult(false, msg)
+            }
+        }
+    }
 }

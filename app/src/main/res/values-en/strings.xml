@@ -98,6 +98,7 @@
     <string name="profile_saved">Profile updated</string>
     <string name="password_updated">Password updated successfully</string>
     <string name="no_changes">No changes to save</string>
+    <string name="error_reauth_required">You must sign in again to delete the account.</string>
 
     <string name="settings_section_appearance">Appearance</string>
     <string name="settings_section_appearance_desc">Adjust the visual look of the application</string>
@@ -122,5 +123,7 @@
     <string name="dialog_delete_message">This action is irreversible. Do you want to continue?</string>
     <string name="dialog_yes_delete">Yes, delete</string>
     <string name="dialog_cancel">Cancel</string>
+    <string name="account_deleted">Your account has been deleted</string>
+    <string name="error_session_invalid">Invalid session</string>
 
 </resources>

@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.campusdigitalfp.tareaflow.data.PreferencesRepository
 import com.campusdigitalfp.tareaflow.data.model.UserPreferences
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -17,20 +19,57 @@ class PreferencesViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
+
+            val auth = FirebaseAuth.getInstance()
+            val user = auth.currentUser
+
+            // si no hay usuario logueado → usar prefs por defecto
+            if (user == null) {
+                _prefs.value = UserPreferences()   // valores por defecto
+                _isLoaded.value = true             // dejar pasar a la UI
+                return@launch
+            }
+
+            // si hay usuario → usamos Firestore
             repo.ensureDocumentExists()
+
             repo.listenPreferences().collect { loaded ->
                 _prefs.value = loaded
-                _isLoaded.value = true   // ya tenemos datos se muestra UI
+                _isLoaded.value = true
             }
         }
     }
-
     fun setDarkTheme(value: Boolean) {
         viewModelScope.launch { repo.updateDarkTheme(value) }
     }
-
     fun setPomodoro(minutes: Int) {
         viewModelScope.launch { repo.updatePomodoro(minutes) }
+    }
+    // Función auxiliar: espera a que FirebaseAuth tenga usuario
+    suspend fun waitForUserAuthenticated() {
+        val auth = FirebaseAuth.getInstance()
+        while (auth.currentUser == null) {
+            delay(50)
+        }
+    }
+
+    fun reload() {
+        viewModelScope.launch {
+            val auth = FirebaseAuth.getInstance()
+
+            if (auth.currentUser == null) {
+                _prefs.value = UserPreferences()
+                _isLoaded.value = true
+                return@launch
+            }
+
+            repo.ensureDocumentExists()
+
+            repo.listenPreferences().collect { loaded ->
+                _prefs.value = loaded
+                _isLoaded.value = true
+            }
+        }
     }
 }
 

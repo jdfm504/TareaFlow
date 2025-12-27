@@ -266,7 +266,7 @@ fun RegisterScreen(
             Button(
                 onClick = {
                     if (validate()) {
-                        viewModel.register(email, password) {
+                        viewModel.register(email, password, name) {
 
                             // Guardamos el nombre en el perfil
                             viewModel.saveUserName(name)

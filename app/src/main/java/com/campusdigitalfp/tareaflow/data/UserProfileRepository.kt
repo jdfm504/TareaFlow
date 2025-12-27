@@ -62,4 +62,16 @@ class UserProfileRepository {
 
         awaitClose { subscription.remove() }
     }
+
+    suspend fun createInitialProfile(name: String, email: String, createdAt: Long) {
+        val doc = profileDocument() ?: return
+
+        val data = UserProfile(
+            name = name,
+            email = email,
+            createdAt = createdAt
+        )
+
+        doc.set(data).await()
+    }
 }

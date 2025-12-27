@@ -35,4 +35,11 @@ class UserProfileViewModel : ViewModel() {
             _profile.value = _profile.value.copy(name = newName)
         }
     }
+
+    fun reload() {
+        viewModelScope.launch {
+            val profile = repo.loadUserProfile()
+            _profile.value = profile
+        }
+    }
 }

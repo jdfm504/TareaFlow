@@ -15,6 +15,7 @@ import com.campusdigitalfp.tareaflow.ui.screens.home.TaskEditScreen
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.TaskViewModel
 import com.campusdigitalfp.tareaflow.ui.screens.settings.SettingsScreen
+import com.campusdigitalfp.tareaflow.viewmodel.PreferencesViewModel
 import kotlinx.coroutines.tasks.await
 import com.campusdigitalfp.tareaflow.viewmodel.UserProfileViewModel
 
@@ -26,6 +27,7 @@ fun TareaFlowNavHost(
     profileViewModel: UserProfileViewModel
 ) {
     val auth = FirebaseAuth.getInstance()
+    val prefsViewModel: PreferencesViewModel = viewModel()
 
     // Validar usuario al arrancar la app
     LaunchedEffect(Unit) {
@@ -44,16 +46,12 @@ fun TareaFlowNavHost(
     // Si no hay usuario: onboarding. Si lo hay: Home.
     val startDestination = if (auth.currentUser == null) "onboarding" else "home"
 
-    // Si ya está logueado, iniciar escucha de tareas
-    if (auth.currentUser != null) {
-        taskViewModel.startListeningToTasks()
-    }
-
     NavHost(
         navController = navController,
         startDestination = startDestination
     ) {
 
+        // ============ ONBOARDING ============
         composable("onboarding") {
             OnboardingScreen(
                 onStart = { navController.navigate("register") },
@@ -61,6 +59,7 @@ fun TareaFlowNavHost(
             )
         }
 
+        // ============ LOGIN ============
         composable("login") {
             LoginScreen(
                 onLoginSuccess = {
@@ -72,10 +71,13 @@ fun TareaFlowNavHost(
                 onGoToRegister = { navController.navigate("register") }
             )
         }
+
+        // ============ REGISTER ============
         composable("register") {
             RegisterScreen(
                 onRegisterSuccess = {
-                    taskViewModel.startListeningToTasks()
+                    profileViewModel.reload()
+                    prefsViewModel.reload()
                     navController.navigate("home") {
                         popUpTo(0) { inclusive = true }
                     }
@@ -84,7 +86,11 @@ fun TareaFlowNavHost(
             )
         }
 
+        // ============ HOME ============
         composable("home") {
+            val currentUid = FirebaseAuth.getInstance().currentUser?.uid ?: "no-user"
+            val taskViewModel: TaskViewModel = viewModel(key = "tasks_$currentUid")
+
             ProtectedRoute(navController) {
                 HomeScreen(
                     navController = navController,
@@ -95,25 +101,35 @@ fun TareaFlowNavHost(
             }
         }
 
+        // ============ NUEVA TAREA ============
         composable("task/new") {
+            val currentUid = FirebaseAuth.getInstance().currentUser?.uid ?: "no-user"
+            val taskViewModel: TaskViewModel = viewModel(key = "tasks_$currentUid")
+
             TaskEditScreen(
                 navController = navController,
                 viewModel = taskViewModel
             )
         }
 
+        // ============ EDITAR TAREA ============
         composable("task/{taskId}") { backStackEntry ->
+            val currentUid = FirebaseAuth.getInstance().currentUser?.uid ?: "no-user"
+            val taskViewModel: TaskViewModel = viewModel(key = "tasks_$currentUid")
             val taskId = backStackEntry.arguments?.getString("taskId")
+
             TaskEditScreen(
                 navController = navController,
                 viewModel = taskViewModel,
                 taskId = taskId)
         }
 
+        // ============ ABOUT ============
         composable("about") {
             AboutScreen(navController)
         }
 
+        // ============ SETTINGS ============
         composable("settings") {
             SettingsScreen(
                 navController = navController,

@@ -30,6 +30,7 @@ import com.campusdigitalfp.tareaflow.ui.theme.ApplyStatusBarTheme
 import com.campusdigitalfp.tareaflow.viewmodel.PreferencesViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.UserProfileViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun SettingsScreen(
@@ -326,7 +327,33 @@ fun SettingsScreen(
                 )
             },
             confirmButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
+                val authViewModel: AuthViewModel = viewModel()
+
+                TextButton(onClick = {
+                    showDeleteDialog = false
+
+                    authViewModel.deleteAccount { success, messageRes ->
+                        if (!success) {
+                            Toast.makeText(
+                                context,
+                                context.getString(messageRes!!),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        } else {
+                            Toast.makeText(
+                                context,
+                                R.string.account_deleted,
+                                Toast.LENGTH_LONG
+                            ).show()
+
+                            FirebaseAuth.getInstance().signOut()
+
+                            navController.navigate("onboarding") {
+                                popUpTo(0)
+                            }
+                        }
+                    }
+                }) {
                     Text(
                         text = stringResource(R.string.dialog_yes_delete),
                         color = MaterialTheme.colorScheme.error

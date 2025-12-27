@@ -34,7 +34,7 @@ class TaskViewModel : ViewModel() {
     // cuando el usuario está logueado
     // --------------------------------------------------------------
     fun startListeningToTasks() {
-        if (listening) return
+        tasksJob?.cancel()
         listening = true
 
         tasksJob = viewModelScope.launch {

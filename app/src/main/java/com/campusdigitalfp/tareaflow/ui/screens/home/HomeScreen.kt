@@ -44,6 +44,7 @@ import com.campusdigitalfp.tareaflow.ui.theme.GreenDark
 import com.campusdigitalfp.tareaflow.data.model.Task
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.UserProfileViewModel
+import kotlinx.coroutines.tasks.await
 
 @Composable
 fun SectionHeader(
@@ -160,6 +161,15 @@ fun HomeScreen(
     val tasks by viewModel.tasks.collectAsState() // Lista de firestore
     val context = LocalContext.current
 
+    // arrancar escucha de tareas cuando haya usuario
+    val currentUid = FirebaseAuth.getInstance().currentUser?.uid
+
+    LaunchedEffect(currentUid) {
+        if (currentUid != null) {
+            viewModel.startListeningToTasks()
+        }
+    }
+
     var menuExpanded by remember { mutableStateOf(false) }
 
     // colores animados para TopBar y FAB
@@ -186,6 +196,30 @@ fun HomeScreen(
     val isAnonymous = FirebaseAuth.getInstance().currentUser?.isAnonymous == true
 
     val profile by profileViewModel.profile.collectAsState()
+
+    // Si se borra usuario desde Firebase se cerrará sesión impidiendo su uso
+    LaunchedEffect(Unit) {
+        val auth = FirebaseAuth.getInstance()
+        val user = auth.currentUser
+
+        if (user != null) {
+            try {
+                user.reload().await()
+            } catch (e: Exception) {
+                // Usuario inválido → cerramos sesión y mandamos a login
+                authViewModel.logout()
+                Toast.makeText(
+                    context,
+                    R.string.error_session_invalid,
+                    Toast.LENGTH_LONG
+                ).show()
+
+                navController.navigate("login") {
+                    popUpTo(0) { inclusive = true }
+                }
+            }
+        }
+    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },

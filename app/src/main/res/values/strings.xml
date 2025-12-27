@@ -109,7 +109,7 @@
     <string name="profile_saved">Perfil actualizado</string>
     <string name="password_updated">Contraseña actualizada correctamente</string>
     <string name="no_changes">No hay cambios para guardar</string>
-
+    <string name="error_reauth_required">Debes iniciar sesión de nuevo para borrar la cuenta.</string>
 
     <!-- Apariencia -->
     <string name="settings_section_appearance">Apariencia</string>
@@ -139,5 +139,7 @@
     <string name="dialog_delete_message">Esta acción es irreversible. ¿Quieres continuar?</string>
     <string name="dialog_yes_delete">Sí, eliminar</string>
     <string name="dialog_cancel">Cancelar</string>
+    <string name="account_deleted">Tu cuenta ha sido eliminada</string>
+    <string name="error_session_invalid">Sesión inválida</string>
 
 </resources>
