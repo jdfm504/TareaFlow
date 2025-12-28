@@ -54,10 +54,33 @@ fun SettingsScreen(
     var repeatPassword by rememberSaveable { mutableStateOf("") }
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
 
-    var tempPomodoro by rememberSaveable { mutableStateOf(prefs.pomodoroMinutes.toString()) }
-    var tempShortBreak by rememberSaveable { mutableStateOf(prefs.shortBreakMinutes.toString()) }
-    var tempLongBreak by rememberSaveable { mutableStateOf(prefs.longBreakMinutes.toString()) }
-    var tempCycles by rememberSaveable { mutableStateOf(prefs.cyclesUntilLongBreak.toString()) }
+    val prefsState = prefsViewModel.prefs.collectAsState().value
+    val prefsLoaded = prefsViewModel.isLoaded.collectAsState().value
+
+    if (!prefsLoaded) {
+        // Pantalla limpia de carga
+        Box(
+            Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+        return   // No dibujar ajustes todavía
+    }
+
+    var tempPomodoro by rememberSaveable { mutableStateOf("") }
+    var tempShortBreak by rememberSaveable { mutableStateOf("") }
+    var tempLongBreak by rememberSaveable { mutableStateOf("") }
+    var tempCycles by rememberSaveable { mutableStateOf("") }
+
+    LaunchedEffect(prefsLoaded) {
+        if (prefsLoaded) {
+            tempPomodoro = prefsState.pomodoroMinutes.toString()
+            tempShortBreak = prefsState.shortBreakMinutes.toString()
+            tempLongBreak = prefsState.longBreakMinutes.toString()
+            tempCycles = prefsState.cyclesUntilLongBreak.toString()
+        }
+    }
 
     var tempName by rememberSaveable { mutableStateOf("") }
 
@@ -245,6 +268,27 @@ fun SettingsScreen(
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Text(
+                text = (stringResource(R.string.settings_autophase)),
+                modifier = Modifier.weight(1f),
+                fontSize = 16.sp
+            )
+
+            Switch(
+                checked = prefs.autoStartNextPhase,
+                onCheckedChange = {
+                    prefsViewModel.setAutoStart(it)
+                }
+            )
+        }
 
         SoftDivider()
 

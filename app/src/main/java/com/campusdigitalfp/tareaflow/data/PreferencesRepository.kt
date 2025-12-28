@@ -86,4 +86,12 @@ class PreferencesRepository {
     suspend fun updateCycles(value: Int) {
         preferencesDocument().update("cyclesUntilLongBreak", value).await()
     }
+
+    suspend fun updateAutoStart(value: Boolean) {
+        preferencesDocument()?.update("autoStartNextPhase", value)?.await()
+    }
+
+    suspend fun updatePhaseTipShown() {
+        preferencesDocument()?.update("phaseTipShown", true)?.await()
+    }
 }

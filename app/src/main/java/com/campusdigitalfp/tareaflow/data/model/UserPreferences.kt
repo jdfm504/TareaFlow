@@ -7,5 +7,7 @@ data class UserPreferences(
     val pomodoroMinutes: Int = 30,
     val shortBreakMinutes: Int = 5,
     val longBreakMinutes: Int = 15,
-    val cyclesUntilLongBreak: Int = 4
+    val cyclesUntilLongBreak: Int = 4,
+    val autoStartNextPhase: Boolean = true,
+    val phaseTipShown: Boolean = false
 )

@@ -7,15 +7,20 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.rounded.Bedtime
 import androidx.compose.material.icons.rounded.Coffee
 import androidx.compose.material.icons.rounded.Timer
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -85,6 +90,41 @@ fun PomodoroScreen(
         PomodoroPhase.LONG_BREAK -> Icons.Rounded.Bedtime
     }
 
+    val prefsState by prefsViewModel.prefs.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(mode) {
+        if (mode == PomodoroMode.POMODORO && !prefsState.phaseTipShown) {
+            snackbarHostState.showSnackbar(
+                "Pulsa el icono para cambiar manualmente de fase"
+            )
+            prefsViewModel.markPhaseTipShown()
+        }
+    }
+
+
+    var showHelp by remember { mutableStateOf(false) }
+
+    if (showHelp) {
+        AlertDialog(
+            onDismissRequest = { showHelp = false },
+            title = { Text("¿Cómo funciona el método Pomodoro?") },
+            text = {
+                Text(
+                    "● 25 minutos de concentración\n" +
+                            "● 5 minutos de descanso corto\n" +
+                            "● Cada 4 ciclos → descanso largo\n\n" +
+                            "Puedes tocar el icono superior para cambiar la fase manualmente."
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { showHelp = false }) {
+                    Text("Entendido")
+                }
+            }
+        )
+    }
+
     //  cambio de fase
     fun nextPhase() {
         when (phase) {
@@ -120,7 +160,11 @@ fun PomodoroScreen(
 
             if (mode == PomodoroMode.POMODORO) {
                 nextPhase()
-                startTimer()
+                if (prefs.autoStartNextPhase) {
+                    startTimer()
+                } else {
+                    isRunning = false
+                }
             }
         }
     }
@@ -149,12 +193,18 @@ fun PomodoroScreen(
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Pomodoro") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { showHelp = true }) {
+                        Icon(Icons.Default.Info, contentDescription = "Ayuda")
                     }
                 }
             )
@@ -176,6 +226,15 @@ fun PomodoroScreen(
                     .fillMaxWidth()
                     .wrapContentWidth(Alignment.CenterHorizontally)
                     .size(60.dp)
+                    .clickable {
+                        if (mode == PomodoroMode.POMODORO) {
+
+                            pauseTimer()     // si estaba iniciado, parar
+                            nextPhase()      // cambiar fase correctamente
+
+                            remainingSeconds = initialSeconds()   // actualizar el tiempo
+                        }
+                    }
             )
 
             PomodoroModeSelector(

@@ -89,5 +89,13 @@ class PreferencesViewModel : ViewModel() {
         _prefs.value = UserPreferences()
         _isLoaded.value = false
     }
+
+    fun setAutoStart(value: Boolean) {
+        viewModelScope.launch { repo.updateAutoStart(value) }
+    }
+
+    fun markPhaseTipShown() {
+        viewModelScope.launch { repo.updatePhaseTipShown() }
+    }
 }
 

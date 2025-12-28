@@ -113,6 +113,7 @@
     <string name="error_reauth_required">Debes iniciar sesión de nuevo para borrar la cuenta.</string>
     <string name="settings_name_disabled">Regístrate para poder cambiar tu nombre.</string>
     <string name="settings_password_disabled">Regístrate para poder cambiar tu contraseña.</string>
+    <string name="settings_autophase">Cambiar de fase automáticamente</string>
 
     <!-- Apariencia -->
     <string name="settings_section_appearance">Apariencia</string>

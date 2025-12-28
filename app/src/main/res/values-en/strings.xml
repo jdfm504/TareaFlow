@@ -102,6 +102,7 @@
     <string name="error_reauth_required">You must sign in again to delete the account.</string>
     <string name="settings_name_disabled">Register to change your name.</string>
     <string name="settings_password_disabled">Register to change your password.</string>
+    <string name="settings_autophase">Switch phase automatically</string>
 
     <string name="settings_section_appearance">Appearance</string>
     <string name="settings_section_appearance_desc">Adjust the visual look of the application</string>
