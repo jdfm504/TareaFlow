@@ -27,13 +27,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.campusdigitalfp.tareaflow.viewmodel.PomodoroViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.PreferencesViewModel
 import kotlinx.coroutines.*
-import kotlin.times
-
+import com.campusdigitalfp.tareaflow.R
 
 enum class PomodoroMode { SIMPLE, POMODORO }
 
@@ -43,168 +45,120 @@ enum class PomodoroPhase {
     LONG_BREAK    // descanso largo
 }
 
-
+@SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PomodoroScreen(
     navController: NavController,
-    prefsViewModel: PreferencesViewModel
+    prefsViewModel: PreferencesViewModel,
+    pomodoroViewModel: PomodoroViewModel = viewModel()
 ) {
     val prefs = prefsViewModel.prefs.collectAsState().value
 
-    var mode by remember { mutableStateOf(PomodoroMode.SIMPLE) }
-    var phase by remember { mutableStateOf(PomodoroPhase.FOCUS) }
-    var cycleCount by remember { mutableStateOf(0) }
-    var isRunning by remember { mutableStateOf(false) }
-    var timerJob by remember { mutableStateOf<Job?>(null) }
-
-    // Tiempo inicial según fase
-    fun initialSeconds(): Int = when (phase) {
-        PomodoroPhase.FOCUS -> prefs.pomodoroMinutes * 60
-        PomodoroPhase.SHORT_BREAK -> prefs.shortBreakMinutes * 60
-        PomodoroPhase.LONG_BREAK -> prefs.longBreakMinutes * 60
+    // Inicializar si es primer arranque
+    LaunchedEffect(Unit) {
+        pomodoroViewModel.initTimer(prefs)
     }
 
-    var remainingSeconds by remember { mutableStateOf(initialSeconds()) }
+    // Posibles estados controlados en viewmodel
+    val mode = pomodoroViewModel.mode
+    val phase = pomodoroViewModel.phase
+    val isRunning = pomodoroViewModel.isRunning
+    val cycleCount = pomodoroViewModel.cycleCount
+    val remainingSeconds = pomodoroViewModel.remainingSeconds
+    val totalSeconds = pomodoroViewModel.totalSeconds
 
-    var progress by remember { mutableStateOf(1f) }
-    var timeText by remember { mutableStateOf("00:00") }
-
-    //  Actualizar el tiempo
-    LaunchedEffect(remainingSeconds, phase, prefs) {
-        val total = initialSeconds().toFloat()
-        progress = remainingSeconds / total
-        timeText = String.format("%02d:%02d", remainingSeconds / 60, remainingSeconds % 60)
+    val progress = if (totalSeconds > 0) {
+        remainingSeconds.toFloat() / totalSeconds.toFloat()
+    } else {
+        1f
     }
 
-    // Color segun la fase del pomodoro
+    val timeText = String.format(
+        "%02d:%02d",
+        remainingSeconds / 60,
+        remainingSeconds % 60
+    )
+
+    // Colores para cada fase
     val phaseColor = when (phase) {
         PomodoroPhase.FOCUS -> Color(0xFFE53935)        // rojo
         PomodoroPhase.SHORT_BREAK -> Color(0xFF42A5F5)  // azul
         PomodoroPhase.LONG_BREAK -> Color(0xFF66BB6A)   // verde
     }
 
+    // Iconos para cada fase
     val phaseIcon = when (phase) {
         PomodoroPhase.FOCUS -> Icons.Rounded.Timer
         PomodoroPhase.SHORT_BREAK -> Icons.Rounded.Coffee
         PomodoroPhase.LONG_BREAK -> Icons.Rounded.Bedtime
     }
 
-    val prefsState by prefsViewModel.prefs.collectAsState()
+    // Mensaje de consejo sobre pomodoro
     val snackbarHostState = remember { SnackbarHostState() }
+    val prefsState by prefsViewModel.prefs.collectAsState()
+
+    val phaseTipText = stringResource(R.string.pomodoro_snackbar_phase_tip)
 
     LaunchedEffect(mode) {
         if (mode == PomodoroMode.POMODORO && !prefsState.phaseTipShown) {
-            snackbarHostState.showSnackbar(
-                "Pulsa el icono para cambiar manualmente de fase"
-            )
+            snackbarHostState.showSnackbar(phaseTipText)
             prefsViewModel.markPhaseTipShown()
         }
     }
 
-
+    // Ayuda sobre pomodoro
     var showHelp by remember { mutableStateOf(false) }
 
     if (showHelp) {
         AlertDialog(
             onDismissRequest = { showHelp = false },
-            title = { Text("¿Cómo funciona el método Pomodoro?") },
+            title = {  Text(stringResource(R.string.pomodoro_help_title)) },
             text = {
                 Text(
-                    "● 25 minutos de concentración\n" +
-                            "● 5 minutos de descanso corto\n" +
-                            "● Cada 4 ciclos → descanso largo\n\n" +
-                            "Puedes tocar el icono superior para cambiar la fase manualmente."
+                    stringResource(
+                        R.string.pomodoro_help_body,
+                        prefs.pomodoroMinutes,
+                        prefs.shortBreakMinutes,
+                        prefs.cyclesUntilLongBreak
+                    )
                 )
             },
             confirmButton = {
                 TextButton(onClick = { showHelp = false }) {
-                    Text("Entendido")
+                    Text(stringResource(R.string.pomodoro_help_button))
                 }
             }
         )
     }
 
-    //  cambio de fase
-    fun nextPhase() {
-        when (phase) {
-            PomodoroPhase.FOCUS -> {
-                cycleCount++
-                phase = if (cycleCount % prefs.cyclesUntilLongBreak == 0)
-                    PomodoroPhase.LONG_BREAK
-                else PomodoroPhase.SHORT_BREAK
-            }
-            PomodoroPhase.SHORT_BREAK -> {
-                phase = PomodoroPhase.FOCUS
-            }
-            PomodoroPhase.LONG_BREAK -> {
-                phase = PomodoroPhase.FOCUS
-                cycleCount = 0
-            }
-        }
-        remainingSeconds = initialSeconds()
-    }
+    // Helper para fin de fase
+    fun handlePhaseFinish() {
+        if (pomodoroViewModel.mode == PomodoroMode.POMODORO) {
+            pomodoroViewModel.goToNextPhase(prefs)
 
-    // control de temporizador
-    fun startTimer() {
-        if (timerJob != null) return
-        isRunning = true
-
-        timerJob = CoroutineScope(Dispatchers.Main).launch {
-            while (remainingSeconds > 0) {
-                delay(1000)
-                remainingSeconds--
-            }
-            timerJob = null
-            isRunning = false
-
-            if (mode == PomodoroMode.POMODORO) {
-                nextPhase()
-                if (prefs.autoStartNextPhase) {
-                    startTimer()
-                } else {
-                    isRunning = false
+            if (prefs.autoStartNextPhase) {
+                pomodoroViewModel.start {
+                    handlePhaseFinish()
                 }
             }
         }
     }
 
-    fun pauseTimer() {
-        timerJob?.cancel()
-        timerJob = null
-        isRunning = false
-    }
-
-    fun resetTimer() {
-        pauseTimer()                         // detener
-        phase = PomodoroPhase.FOCUS          // volver a foco
-        cycleCount = 0                       // reiniciar ciclos
-        remainingSeconds = prefs.pomodoroMinutes * 60  // tiempo inicial
-    }
-
-    @SuppressLint("DefaultLocale")
-    fun resetSimple() {
-        pauseTimer()
-        remainingSeconds = prefs.pomodoroMinutes * 60
-        timeText = String.format(
-            "%02d:%02d", remainingSeconds / 60, remainingSeconds % 60
-        )
-        progress = 1f
-    }
-
+    // Pantalla principal de pomodoro
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Pomodoro") },
+                title = { Text(stringResource(R.string.pomodoro_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                     }
                 },
                 actions = {
                     IconButton(onClick = { showHelp = true }) {
-                        Icon(Icons.Default.Info, contentDescription = "Ayuda")
+                        Icon(Icons.Default.Info, stringResource(R.string.pomodoro_help_icon_cd))
                     }
                 }
             )
@@ -218,6 +172,7 @@ fun PomodoroScreen(
                 .padding(16.dp)
         ) {
 
+            // Icono según fase
             Icon(
                 imageVector = phaseIcon,
                 contentDescription = null,
@@ -226,63 +181,38 @@ fun PomodoroScreen(
                     .fillMaxWidth()
                     .wrapContentWidth(Alignment.CenterHorizontally)
                     .size(60.dp)
-                    .clickable {
+                    .let { base ->
+                        // Solo clicable en modo Pomodoro completo
                         if (mode == PomodoroMode.POMODORO) {
+                            base.clickable {
+                                pomodoroViewModel.goToNextPhase(prefs)
 
-                            pauseTimer()     // si estaba iniciado, parar
-                            nextPhase()      // cambiar fase correctamente
 
-                            remainingSeconds = initialSeconds()   // actualizar el tiempo
+                            }
+                        } else {
+                            base
                         }
                     }
             )
 
+            Spacer(Modifier.height(12.dp))
+
+            // Cambio de modo
             PomodoroModeSelector(
                 selected = mode,
                 onChange = { newMode ->
-                    mode = newMode
-                    pauseTimer()
-
-                    phase = PomodoroPhase.FOCUS
-                    cycleCount = 0
-                    remainingSeconds = prefs.pomodoroMinutes * 60
-                    progress = 1f
-                    timeText = String.format("%02d:%02d", prefs.pomodoroMinutes, 0)
+                    pomodoroViewModel.changeMode(prefs, newMode)
                 }
             )
 
             Spacer(Modifier.height(20.dp))
 
-            // modo simple
-            if (mode == PomodoroMode.SIMPLE) {
-
-                Text("Modo temporizador simple", style = MaterialTheme.typography.titleMedium)
-                Spacer(Modifier.height(30.dp))
-
-                CircularTimer(
-                    progress = progress,
-                    timeText = timeText,
-                    ringColor = phaseColor,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-
-                Spacer(Modifier.height(30.dp))
-
-                PomodoroControls(
-                    isRunning = isRunning,
-                    onStart = { startTimer() },
-                    onPause = { pauseTimer() },
-                    onReset = { resetSimple() }
-                )
-            }
-
-            // modo completo
-            else {
-
+            // Texto fase / ciclo solo en modo completo
+            if (mode == PomodoroMode.POMODORO) {
                 val phaseText = when (phase) {
-                    PomodoroPhase.FOCUS -> "Concentración"
-                    PomodoroPhase.SHORT_BREAK -> "Descanso corto"
-                    PomodoroPhase.LONG_BREAK -> "Descanso largo"
+                    PomodoroPhase.FOCUS -> stringResource(R.string.pomodoro_phase_focus)
+                    PomodoroPhase.SHORT_BREAK -> stringResource(R.string.pomodoro_phase_short_break)
+                    PomodoroPhase.LONG_BREAK -> stringResource(R.string.pomodoro_phase_long_break)
                 }
 
                 Text(
@@ -291,28 +221,40 @@ fun PomodoroScreen(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    "Ciclo $cycleCount",
+                    stringResource(R.string.pomodoro_cycle_label, cycleCount),
                     color = MaterialTheme.colorScheme.primary
                 )
 
-                Spacer(Modifier.height(30.dp))
-
-                CircularTimer(
-                    progress = progress,
-                    timeText = timeText,
-                    ringColor = phaseColor,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                Spacer(Modifier.height(16.dp))
+            } else {
+                Text(
+                    stringResource(R.string.pomodoro_simple_mode_title),
+                    style = MaterialTheme.typography.titleMedium
                 )
-
-                Spacer(Modifier.height(30.dp))
-
-                PomodoroControls(
-                    isRunning = isRunning,
-                    onStart = { startTimer() },
-                    onPause = { pauseTimer() },
-                    onReset = { resetTimer() }
-                )
+                Spacer(Modifier.height(16.dp))
             }
+
+            // Temporizador
+            CircularTimer(
+                progress = progress,
+                timeText = timeText,
+                ringColor = phaseColor,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
+            Spacer(Modifier.height(30.dp))
+
+            // Controles
+            PomodoroControls(
+                isRunning = isRunning,
+                onStart = {
+                    pomodoroViewModel.start {
+                        handlePhaseFinish()
+                    }
+                },
+                onPause = { pomodoroViewModel.pause() },
+                onReset = { pomodoroViewModel.reset(prefs) }
+            )
         }
     }
 }
@@ -331,14 +273,14 @@ fun PomodoroModeSelector(
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         ModeButton(
-            text = "Temporizador",
+            text = stringResource(R.string.pomodoro_mode_simple),
             selected = selected == PomodoroMode.SIMPLE,
             onClick = { onChange(PomodoroMode.SIMPLE) },
             modifier = Modifier.weight(1f)
         )
 
         ModeButton(
-            text = "Pomodoro",
+            text =  stringResource(R.string.pomodoro_mode_full),
             selected = selected == PomodoroMode.POMODORO,
             onClick = { onChange(PomodoroMode.POMODORO) },
             modifier = Modifier.weight(1f)
@@ -383,7 +325,10 @@ fun PomodoroControls(
 
         // Iniciar / Pausar
         Text(
-            text = if (isRunning) "Pausar" else "Iniciar",
+            text = if (isRunning)
+                stringResource(R.string.pomodoro_btn_pause)
+            else
+                stringResource(R.string.pomodoro_btn_start),
             modifier = Modifier
                 .clip(RoundedCornerShape(12.dp))
                 .clickable { if (isRunning) onPause() else onStart() }
@@ -395,7 +340,7 @@ fun PomodoroControls(
 
         // Reiniciar
         Text(
-            text = "Reiniciar",
+            text = stringResource(R.string.pomodoro_btn_reset),
             modifier = Modifier
                 .clip(RoundedCornerShape(12.dp))
                 .clickable { onReset() }

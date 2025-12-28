@@ -135,5 +135,27 @@
     <string name="settings_pomodoro_long_break">Long break (min)</string>
     <string name="settings_pomodoro_cycles">Cycles until long break</string>
     <string name="menu_pomodoro">Pomodoro</string>
+    <string name="pomodoro_title">Pomodoro</string>
+    <string name="pomodoro_mode_simple">Timer</string>
+    <string name="pomodoro_mode_full">Pomodoro</string>
+    <string name="pomodoro_help_title">How does the Pomodoro method work?</string>
+    <string name="pomodoro_help_body">
+        ● %1$d minutes of focus
+        &#10;● %2$d minutes of short break
+        &#10;● Every %3$d cycles → long break
+    </string>
+    <string name="pomodoro_help_button">Got it</string>
+    <string name="pomodoro_help_icon_cd">Help</string>
+    <string name="pomodoro_snackbar_phase_tip">
+        Tap the icon to manually change phase
+    </string>
+    <string name="pomodoro_phase_focus">Focus</string>
+    <string name="pomodoro_phase_short_break">Short break</string>
+    <string name="pomodoro_phase_long_break">Long break</string>
+    <string name="pomodoro_cycle_label">Cycle %1$d</string>
+    <string name="pomodoro_simple_mode_title">Simple timer mode</string>
+    <string name="pomodoro_btn_start">Start</string>
+    <string name="pomodoro_btn_pause">Pause</string>
+    <string name="pomodoro_btn_reset">Reset</string>
 
 </resources>

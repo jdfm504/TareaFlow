@@ -152,5 +152,25 @@
     <string name="settings_pomodoro_long_break">Descanso largo (min)</string>
     <string name="settings_pomodoro_cycles">Ciclos hasta descanso largo</string>
     <string name="menu_pomodoro">Pomodoro</string>
+    <string name="pomodoro_title">Pomodoro</string>
+    <string name="pomodoro_mode_simple">Temporizador</string>
+    <string name="pomodoro_mode_full">Pomodoro</string>
+    <string name="pomodoro_help_title">¿Cómo funciona el método Pomodoro?</string>
+    <string name="pomodoro_help_body">
+        ● %1$d minutos de concentración
+        &#10;● %2$d minutos de descanso corto
+        &#10;● Cada %3$d ciclos → descanso largo
+    </string>
+    <string name="pomodoro_help_button">Entendido</string>
+    <string name="pomodoro_help_icon_cd">Ayuda</string>
+    <string name="pomodoro_snackbar_phase_tip">Pulsa el icono para cambiar manualmente de fase</string>
+    <string name="pomodoro_phase_focus">Concentración</string>
+    <string name="pomodoro_phase_short_break">Descanso corto</string>
+    <string name="pomodoro_phase_long_break">Descanso largo</string>
+    <string name="pomodoro_cycle_label">Ciclo %1$d</string>
+    <string name="pomodoro_simple_mode_title">Modo temporizador simple</string>
+    <string name="pomodoro_btn_start">Iniciar</string>
+    <string name="pomodoro_btn_pause">Pausar</string>
+    <string name="pomodoro_btn_reset">Reiniciar</string>
 
 </resources>
