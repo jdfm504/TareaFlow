@@ -157,5 +157,8 @@
     <string name="pomodoro_btn_start">Start</string>
     <string name="pomodoro_btn_pause">Pause</string>
     <string name="pomodoro_btn_reset">Reset</string>
+    <string name="pomodoro_reset_cycles">Reset cycles</string>
+    <string name="pomodoro_exit_title">Exit Pomodoro</string>
+    <string name="pomodoro_exit_message">If you exit, you will lose the current timer and cycles. Do you want to continue?</string>
 
 </resources>

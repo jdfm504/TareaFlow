@@ -1,6 +1,7 @@
 package com.campusdigitalfp.tareaflow.ui.screens.pomodoro
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -36,6 +37,7 @@ import com.campusdigitalfp.tareaflow.viewmodel.PomodoroViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.PreferencesViewModel
 import kotlinx.coroutines.*
 import com.campusdigitalfp.tareaflow.R
+import kotlin.compareTo
 
 enum class PomodoroMode { SIMPLE, POMODORO }
 
@@ -107,6 +109,27 @@ fun PomodoroScreen(
         }
     }
 
+    // Para prevenir el salir accidentalmente de la pantalla
+    var showExitDialog by remember { mutableStateOf(false) }
+
+    fun hasProgress(): Boolean {
+        return pomodoroViewModel.isRunning ||
+                pomodoroViewModel.remainingSeconds != pomodoroViewModel.totalSeconds ||
+                pomodoroViewModel.cycleCount > 0
+    }
+
+    fun requestExit() {
+        if (hasProgress()) {
+            showExitDialog = true
+        } else {
+            navController.popBackStack()
+        }
+    }
+
+    BackHandler {
+        requestExit()
+    }
+
     // Ayuda sobre pomodoro
     var showHelp by remember { mutableStateOf(false) }
 
@@ -132,6 +155,31 @@ fun PomodoroScreen(
         )
     }
 
+    if (showExitDialog) {
+        AlertDialog(
+            onDismissRequest = { showExitDialog = false },
+            title = { Text(stringResource(R.string.pomodoro_exit_title)) },
+            text = { Text(stringResource(R.string.pomodoro_exit_message)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showExitDialog = false
+                        // opcional: resetear estado antes de salir
+                        pomodoroViewModel.reset(prefs)
+                        navController.popBackStack()
+                    }
+                ) {
+                    Text(stringResource(R.string.dialog_yes_delete)) // o crea uno específico tipo "Salir"
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showExitDialog = false }) {
+                    Text(stringResource(R.string.dialog_cancel))
+                }
+            }
+        )
+    }
+
     // Helper para fin de fase
     fun handlePhaseFinish() {
         if (pomodoroViewModel.mode == PomodoroMode.POMODORO) {
@@ -152,7 +200,7 @@ fun PomodoroScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.pomodoro_title)) },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = { requestExit() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                     }
                 },
@@ -220,10 +268,28 @@ fun PomodoroScreen(
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
-                Text(
-                    stringResource(R.string.pomodoro_cycle_label, cycleCount),
-                    color = MaterialTheme.colorScheme.primary
-                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp, bottom = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        stringResource(R.string.pomodoro_cycle_label, cycleCount),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+                    TextButton(
+                        onClick = { pomodoroViewModel.resetCycles(prefs) },
+
+                        ) {
+                        Text(
+                            text = stringResource(R.string.pomodoro_reset_cycles),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
 
                 Spacer(Modifier.height(16.dp))
             } else {

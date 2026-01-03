@@ -111,4 +111,9 @@ class PomodoroViewModel : ViewModel() {
             }
         }
     }
+
+    fun resetCycles(prefs: UserPreferences){
+        pause()
+        cycleCount = 0
+    }
 }

@@ -172,5 +172,8 @@
     <string name="pomodoro_btn_start">Iniciar</string>
     <string name="pomodoro_btn_pause">Pausar</string>
     <string name="pomodoro_btn_reset">Reiniciar</string>
+    <string name="pomodoro_reset_cycles">Reiniciar ciclos</string>
+    <string name="pomodoro_exit_title">Salir del Pomodoro</string>
+    <string name="pomodoro_exit_message">Si sales perderás el temporizador actual y los ciclos. ¿Quieres continuar?</string>
 
 </resources>
