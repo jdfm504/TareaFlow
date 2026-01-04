@@ -58,14 +58,6 @@ class PreferencesViewModel : ViewModel() {
         viewModelScope.launch { repo.updateCycles(count) }
     }
 
-    // Función auxiliar: espera a que FirebaseAuth tenga usuario
-    suspend fun waitForUserAuthenticated() {
-        val auth = FirebaseAuth.getInstance()
-        while (auth.currentUser == null) {
-            delay(50)
-        }
-    }
-
     fun reload() {
         viewModelScope.launch {
             val auth = FirebaseAuth.getInstance()

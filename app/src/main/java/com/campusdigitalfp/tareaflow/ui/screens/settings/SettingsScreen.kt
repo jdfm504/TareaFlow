@@ -73,13 +73,11 @@ fun SettingsScreen(
     var tempLongBreak by rememberSaveable { mutableStateOf("") }
     var tempCycles by rememberSaveable { mutableStateOf("") }
 
-    LaunchedEffect(prefsLoaded) {
-        if (prefsLoaded) {
+    LaunchedEffect(Unit) {
             tempPomodoro = prefsState.pomodoroMinutes.toString()
             tempShortBreak = prefsState.shortBreakMinutes.toString()
             tempLongBreak = prefsState.longBreakMinutes.toString()
             tempCycles = prefsState.cyclesUntilLongBreak.toString()
-        }
     }
 
     var tempName by rememberSaveable { mutableStateOf("") }
@@ -89,19 +87,6 @@ fun SettingsScreen(
     // Cargar nombre al entrar
     LaunchedEffect(profile.name) {
         if (tempName.isEmpty()) tempName = profile.name
-    }
-    // Cargar pomodoro al entrar
-    LaunchedEffect(
-        prefs.pomodoroMinutes,
-        prefs.shortBreakMinutes,
-        prefs.longBreakMinutes,
-        prefs.cyclesUntilLongBreak
-    )
-    {
-        tempPomodoro = prefs.pomodoroMinutes.toString()
-        tempShortBreak = prefs.shortBreakMinutes.toString()
-        tempLongBreak = prefs.longBreakMinutes.toString()
-        tempCycles = prefs.cyclesUntilLongBreak.toString()
     }
 
     Column(
@@ -469,8 +454,6 @@ fun SettingsScreen(
                         //quitar foco del cuadro de texto
                         focusManager.clearFocus()
 
-                        // Guardar cambios de nombre y pomodoro
-                        val otrosCambios = guardarCambiosPerfil()
                     }
                     return@Button
                 }
