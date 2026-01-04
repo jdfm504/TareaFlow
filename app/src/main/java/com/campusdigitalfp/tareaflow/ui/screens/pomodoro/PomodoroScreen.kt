@@ -6,7 +6,9 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
@@ -141,13 +143,11 @@ fun PomodoroScreen(
 
     if (showHelp) {
 
-        // Elegir título según el modo
         val helpTitle = if (mode == PomodoroMode.SIMPLE)
             stringResource(R.string.pomodoro_help_simple_title)
         else
             stringResource(R.string.pomodoro_help_full_title)
 
-        // Elegir texto según el modo
         val helpText = if (mode == PomodoroMode.SIMPLE)
             stringResource(R.string.pomodoro_help_simple_body)
         else
@@ -156,7 +156,15 @@ fun PomodoroScreen(
         AlertDialog(
             onDismissRequest = { showHelp = false },
             title = { Text(helpTitle) },
-            text = { Text(helpText) },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Text(helpText)
+                }
+            },
             confirmButton = {
                 TextButton(onClick = { showHelp = false }) {
                     Text(stringResource(R.string.pomodoro_help_button))
