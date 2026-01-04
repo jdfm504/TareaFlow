@@ -97,5 +97,11 @@ class PreferencesViewModel : ViewModel() {
     fun markPhaseTipShown() {
         viewModelScope.launch { repo.updatePhaseTipShown() }
     }
+
+    fun updateSoundEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            repo.updateSoundEnabled(enabled)
+        }
+    }
 }
 

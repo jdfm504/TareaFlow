@@ -9,5 +9,6 @@ data class UserPreferences(
     val longBreakMinutes: Int = 15,
     val cyclesUntilLongBreak: Int = 4,
     val autoStartNextPhase: Boolean = true,
-    val phaseTipShown: Boolean = false
+    val phaseTipShown: Boolean = false,
+    val soundEnabled: Boolean = true
 )

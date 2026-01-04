@@ -94,4 +94,8 @@ class PreferencesRepository {
     suspend fun updatePhaseTipShown() {
         preferencesDocument()?.update("phaseTipShown", true)?.await()
     }
+
+    suspend fun updateSoundEnabled(value: Boolean) {
+        preferencesDocument()?.update("soundEnabled", value)?.await()
+    }
 }

@@ -290,6 +290,20 @@ fun SettingsScreen(
             )
         }
 
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        ) {
+            Text("Sonido al finalizar fase", modifier = Modifier.weight(1f))
+
+            Switch(
+                checked = prefs.soundEnabled,
+                onCheckedChange = { prefsViewModel.updateSoundEnabled(it) }
+            )
+        }
+
         SoftDivider()
 
         // ======================= CONTRASEÑA =======================

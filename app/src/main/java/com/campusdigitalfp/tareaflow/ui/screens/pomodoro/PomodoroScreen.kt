@@ -208,11 +208,13 @@ fun PomodoroScreen(
     // Helper para fin de fase
     fun handlePhaseFinish() {
         if (pomodoroViewModel.mode == PomodoroMode.POMODORO) {
-            // Determinar qué sonido reproducir según la fase que TERMINA
-            when (phase) {
-                PomodoroPhase.FOCUS -> playSound(R.raw.focus_end)
-                PomodoroPhase.SHORT_BREAK -> playSound(R.raw.short_break_end)
-                PomodoroPhase.LONG_BREAK -> playSound(R.raw.long_break_end)
+            if (prefs.soundEnabled) {
+                // Determinar qué sonido reproducir según la fase que TERMINA
+                when (phase) {
+                    PomodoroPhase.FOCUS -> playSound(R.raw.focus_end)
+                    PomodoroPhase.SHORT_BREAK -> playSound(R.raw.short_break_end)
+                    PomodoroPhase.LONG_BREAK -> playSound(R.raw.long_break_end)
+                }
             }
             pomodoroViewModel.goToNextPhase(prefs)
 
@@ -633,34 +635,48 @@ fun PomodoroControls(
     onReset: () -> Unit
 ) {
     Row(
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        // Iniciar / Pausar
-        Text(
-            text = if (isRunning)
-                stringResource(R.string.pomodoro_btn_pause)
-            else
-                stringResource(R.string.pomodoro_btn_start),
-            modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .clickable { if (isRunning) onPause() else onStart() }
-                .background(MaterialTheme.colorScheme.primary)
-                .padding(horizontal = 32.dp, vertical = 12.dp),
-            color = Color.White,
-            fontWeight = FontWeight.Bold
-        )
 
-        // Reiniciar
-        Text(
-            text = stringResource(R.string.pomodoro_btn_reset),
+        // Botón Start / Pause
+        Box(
             modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .clickable { onReset() }
+                .weight(1f)
+                .height(56.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.primary)
+                .clickable { if (isRunning) onPause() else onStart() },
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = if (isRunning)
+                    stringResource(R.string.pomodoro_btn_pause)
+                else
+                    stringResource(R.string.pomodoro_btn_start),
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        // Botón Reset
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(56.dp)
+                .clip(RoundedCornerShape(16.dp))
                 .background(MaterialTheme.colorScheme.secondary)
-                .padding(horizontal = 32.dp, vertical = 12.dp),
-            color = MaterialTheme.colorScheme.onSecondary,
-            fontWeight = FontWeight.Bold
-        )
+                .clickable { onReset() },
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(R.string.pomodoro_btn_reset),
+                color = MaterialTheme.colorScheme.onSecondary,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
