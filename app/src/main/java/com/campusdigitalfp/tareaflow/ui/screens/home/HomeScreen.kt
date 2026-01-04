@@ -165,12 +165,6 @@ fun HomeScreen(
     // arrancar escucha de tareas cuando haya usuario
     val currentUid = FirebaseAuth.getInstance().currentUser?.uid
 
-    LaunchedEffect(currentUid) {
-        if (currentUid != null) {
-            viewModel.startListeningToTasks()
-        }
-    }
-
     var menuExpanded by remember { mutableStateOf(false) }
 
     // colores animados para TopBar y FAB

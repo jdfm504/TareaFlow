@@ -29,6 +29,10 @@ class TaskViewModel : ViewModel() {
     var showCompleted by mutableStateOf(false)
         private set
 
+    init {
+        startListeningToTasks()
+    }
+
     // --------------------------------------------------------------
     // Debe llamarse desde LoginScreen/Navigation
     // cuando el usuario está logueado

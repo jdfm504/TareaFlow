@@ -92,8 +92,7 @@ fun TareaFlowNavHost(
 
         // ============ HOME ============
         composable("home") {
-            val currentUid = FirebaseAuth.getInstance().currentUser?.uid ?: "no-user"
-            val taskViewModel: TaskViewModel = viewModel(key = "tasks_$currentUid")
+            val taskViewModel: TaskViewModel = viewModel()
 
             ProtectedRoute(navController) {
                 HomeScreen(
@@ -107,8 +106,7 @@ fun TareaFlowNavHost(
 
         // ============ NUEVA TAREA ============
         composable("task/new") {
-            val currentUid = FirebaseAuth.getInstance().currentUser?.uid ?: "no-user"
-            val taskViewModel: TaskViewModel = viewModel(key = "tasks_$currentUid")
+            val taskViewModel: TaskViewModel = viewModel()
 
             TaskEditScreen(
                 navController = navController,
@@ -118,8 +116,7 @@ fun TareaFlowNavHost(
 
         // ============ EDITAR TAREA ============
         composable("task/{taskId}") { backStackEntry ->
-            val currentUid = FirebaseAuth.getInstance().currentUser?.uid ?: "no-user"
-            val taskViewModel: TaskViewModel = viewModel(key = "tasks_$currentUid")
+            val taskViewModel: TaskViewModel = viewModel()
             val taskId = backStackEntry.arguments?.getString("taskId")
 
             TaskEditScreen(
