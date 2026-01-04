@@ -139,11 +139,26 @@
     <string name="pomodoro_mode_simple">Timer</string>
     <string name="pomodoro_mode_full">Pomodoro</string>
     <string name="pomodoro_help_title">How does the Pomodoro method work?</string>
-    <string name="pomodoro_help_body">
-        ● %1$d minutes of focus
-        &#10;● %2$d minutes of short break
-        &#10;● Every %3$d cycles → long break
-    </string>
+    <string name="pomodoro_help_simple_title">Simple timer</string>
+    <string name="pomodoro_help_simple_body">
+        This timer counts down for the configured time.\n
+        You can pause it, reset it, and adjust its duration from the settings.\n
+        The simple mode does not use Pomodoro method phases.
+</string>
+
+    <string name="pomodoro_help_full_title">How Pomodoro works</string>
+    <string name="pomodoro_help_full_body">
+        The Pomodoro method divides work into periods of focus and rest.\n\n
+
+            • Focus: focus period.\n
+            • Short Break: short rest.\n
+            • Long Break: long rest after several cycles.\n\n
+
+        You can tap the phase icon to advance manually.\n
+        The timer does NOT start automatically when doing so.\n\n
+
+        If automatic start is enabled, the next phase will begin on its own when the current one ends.
+</string>
     <string name="pomodoro_help_button">Got it</string>
     <string name="pomodoro_help_icon_cd">Help</string>
     <string name="pomodoro_snackbar_phase_tip">

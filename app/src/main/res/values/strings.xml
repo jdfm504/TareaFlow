@@ -156,11 +156,26 @@
     <string name="pomodoro_mode_simple">Temporizador</string>
     <string name="pomodoro_mode_full">Pomodoro</string>
     <string name="pomodoro_help_title">¿Cómo funciona el método Pomodoro?</string>
-    <string name="pomodoro_help_body">
-        ● %1$d minutos de concentración
-        &#10;● %2$d minutos de descanso corto
-        &#10;● Cada %3$d ciclos → descanso largo
-    </string>
+    <string name="pomodoro_help_simple_title">Temporizador simple</string>
+    <string name="pomodoro_help_simple_body">
+Este temporizador cuenta hacia atrás durante el tiempo configurado.\n
+Puedes pausarlo, reiniciarlo y ajustar su duración desde los ajustes.\n
+El modo simple no utiliza fases del método Pomodoro.
+</string>
+
+    <string name="pomodoro_help_full_title">Cómo funciona Pomodoro</string>
+    <string name="pomodoro_help_full_body">
+El método Pomodoro divide el trabajo en periodos de concentración y descanso.\n\n
+
+• Concentración: periodo de concentración.\n
+• Descanso corto: descanso corto.\n
+• Descanso largo: descanso largo tras varios ciclos.\n\n
+
+Puedes tocar el icono de la fase para avanzar manualmente.\n
+El temporizador NO se inicia automáticamente al hacerlo.\n\n
+
+Si tienes activado el inicio automático, la siguiente fase comenzará sola cuando termine la actual.
+</string>
     <string name="pomodoro_help_button">Entendido</string>
     <string name="pomodoro_help_icon_cd">Ayuda</string>
     <string name="pomodoro_snackbar_phase_tip">Pulsa el icono para cambiar manualmente de fase</string>

@@ -1,6 +1,7 @@
 package com.campusdigitalfp.tareaflow.ui.screens.pomodoro
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +18,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -28,6 +30,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -38,6 +42,9 @@ import com.campusdigitalfp.tareaflow.viewmodel.PreferencesViewModel
 import kotlinx.coroutines.*
 import com.campusdigitalfp.tareaflow.R
 import kotlin.compareTo
+import kotlin.div
+import kotlin.rem
+import kotlin.text.toFloat
 
 enum class PomodoroMode { SIMPLE, POMODORO }
 
@@ -47,8 +54,8 @@ enum class PomodoroPhase {
     LONG_BREAK    // descanso largo
 }
 
-@SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("DefaultLocale")
 @Composable
 fun PomodoroScreen(
     navController: NavController,
@@ -62,7 +69,7 @@ fun PomodoroScreen(
         pomodoroViewModel.initTimer(prefs)
     }
 
-    // Posibles estados controlados en viewmodel
+    // Estados controlados en viewmodel
     val mode = pomodoroViewModel.mode
     val phase = pomodoroViewModel.phase
     val isRunning = pomodoroViewModel.isRunning
@@ -99,7 +106,6 @@ fun PomodoroScreen(
     // Mensaje de consejo sobre pomodoro
     val snackbarHostState = remember { SnackbarHostState() }
     val prefsState by prefsViewModel.prefs.collectAsState()
-
     val phaseTipText = stringResource(R.string.pomodoro_snackbar_phase_tip)
 
     LaunchedEffect(mode) {
@@ -109,7 +115,7 @@ fun PomodoroScreen(
         }
     }
 
-    // Para prevenir el salir accidentalmente de la pantalla
+    // Diálogo de salida si hay progreso
     var showExitDialog by remember { mutableStateOf(false) }
 
     fun hasProgress(): Boolean {
@@ -130,23 +136,27 @@ fun PomodoroScreen(
         requestExit()
     }
 
-    // Ayuda sobre pomodoro
+    // Ayuda contextual según el modo simple o pomodoro del temporizador
     var showHelp by remember { mutableStateOf(false) }
 
     if (showHelp) {
+
+        // Elegir título según el modo
+        val helpTitle = if (mode == PomodoroMode.SIMPLE)
+            stringResource(R.string.pomodoro_help_simple_title)
+        else
+            stringResource(R.string.pomodoro_help_full_title)
+
+        // Elegir texto según el modo
+        val helpText = if (mode == PomodoroMode.SIMPLE)
+            stringResource(R.string.pomodoro_help_simple_body)
+        else
+            stringResource(R.string.pomodoro_help_full_body)
+
         AlertDialog(
             onDismissRequest = { showHelp = false },
-            title = {  Text(stringResource(R.string.pomodoro_help_title)) },
-            text = {
-                Text(
-                    stringResource(
-                        R.string.pomodoro_help_body,
-                        prefs.pomodoroMinutes,
-                        prefs.shortBreakMinutes,
-                        prefs.cyclesUntilLongBreak
-                    )
-                )
-            },
+            title = { Text(helpTitle) },
+            text = { Text(helpText) },
             confirmButton = {
                 TextButton(onClick = { showHelp = false }) {
                     Text(stringResource(R.string.pomodoro_help_button))
@@ -154,6 +164,7 @@ fun PomodoroScreen(
             }
         )
     }
+
 
     if (showExitDialog) {
         AlertDialog(
@@ -164,12 +175,11 @@ fun PomodoroScreen(
                 TextButton(
                     onClick = {
                         showExitDialog = false
-                        // opcional: resetear estado antes de salir
                         pomodoroViewModel.reset(prefs)
                         navController.popBackStack()
                     }
                 ) {
-                    Text(stringResource(R.string.dialog_yes_delete)) // o crea uno específico tipo "Salir"
+                    Text(stringResource(R.string.dialog_yes_delete))
                 }
             },
             dismissButton = {
@@ -193,7 +203,6 @@ fun PomodoroScreen(
         }
     }
 
-    // Pantalla principal de pomodoro
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
@@ -201,130 +210,346 @@ fun PomodoroScreen(
                 title = { Text(stringResource(R.string.pomodoro_title)) },
                 navigationIcon = {
                     IconButton(onClick = { requestExit() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
                 },
                 actions = {
                     IconButton(onClick = { showHelp = true }) {
-                        Icon(Icons.Default.Info, stringResource(R.string.pomodoro_help_icon_cd))
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = stringResource(R.string.pomodoro_help_icon_cd)
+                        )
                     }
                 }
             )
         }
     ) { padding ->
 
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
+        val configuration = LocalConfiguration.current
+        val isLandscape =
+            configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-            // Icono según fase
-            Icon(
-                imageVector = phaseIcon,
-                contentDescription = null,
-                tint = phaseColor,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentWidth(Alignment.CenterHorizontally)
-                    .size(60.dp)
-                    .let { base ->
-                        // Solo clicable en modo Pomodoro completo
-                        if (mode == PomodoroMode.POMODORO) {
-                            base.clickable {
-                                pomodoroViewModel.goToNextPhase(prefs)
-
-
-                            }
-                        } else {
-                            base
-                        }
-                    }
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            // Cambio de modo
-            PomodoroModeSelector(
-                selected = mode,
-                onChange = { newMode ->
-                    pomodoroViewModel.changeMode(prefs, newMode)
-                }
-            )
-
-            Spacer(Modifier.height(20.dp))
-
-            // Texto fase / ciclo solo en modo completo
+        val onPhaseIconClick: () -> Unit = {
             if (mode == PomodoroMode.POMODORO) {
-                val phaseText = when (phase) {
-                    PomodoroPhase.FOCUS -> stringResource(R.string.pomodoro_phase_focus)
-                    PomodoroPhase.SHORT_BREAK -> stringResource(R.string.pomodoro_phase_short_break)
-                    PomodoroPhase.LONG_BREAK -> stringResource(R.string.pomodoro_phase_long_break)
-                }
-
-                Text(
-                    phaseText,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp, bottom = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        stringResource(R.string.pomodoro_cycle_label, cycleCount),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-
-                    TextButton(
-                        onClick = { pomodoroViewModel.resetCycles(prefs) },
-
-                        ) {
-                        Text(
-                            text = stringResource(R.string.pomodoro_reset_cycles),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-
-                Spacer(Modifier.height(16.dp))
-            } else {
-                Text(
-                    stringResource(R.string.pomodoro_simple_mode_title),
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Spacer(Modifier.height(16.dp))
+                pomodoroViewModel.pause()
+                pomodoroViewModel.goToNextPhase(prefs)
             }
+        }
 
-            // Temporizador
-            CircularTimer(
+        if (isLandscape) {
+            PomodoroLandscapeLayout(
+                padding = padding,
+                mode = mode,
+                phase = phase,
+                phaseColor = phaseColor,
+                phaseIcon = phaseIcon,
+                cycleCount = cycleCount,
                 progress = progress,
                 timeText = timeText,
-                ringColor = phaseColor,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-
-            Spacer(Modifier.height(30.dp))
-
-            // Controles
-            PomodoroControls(
                 isRunning = isRunning,
                 onStart = {
-                    pomodoroViewModel.start {
-                        handlePhaseFinish()
-                    }
+                    pomodoroViewModel.start { handlePhaseFinish() }
                 },
                 onPause = { pomodoroViewModel.pause() },
-                onReset = { pomodoroViewModel.reset(prefs) }
+                onResetTimer = { pomodoroViewModel.reset(prefs) },
+                onResetCycles = { pomodoroViewModel.resetCycles(prefs) },
+                onModeChange = { newMode ->
+                    pomodoroViewModel.changeMode(prefs, newMode)
+                },
+                onPhaseIconClick = onPhaseIconClick
+            )
+        } else {
+            PomodoroPortraitLayout(
+                padding = padding,
+                mode = mode,
+                phase = phase,
+                phaseColor = phaseColor,
+                phaseIcon = phaseIcon,
+                cycleCount = cycleCount,
+                progress = progress,
+                timeText = timeText,
+                isRunning = isRunning,
+                onStart = {
+                    pomodoroViewModel.start { handlePhaseFinish() }
+                },
+                onPause = { pomodoroViewModel.pause() },
+                onResetTimer = { pomodoroViewModel.reset(prefs) },
+                onResetCycles = { pomodoroViewModel.resetCycles(prefs) },
+                onModeChange = { newMode ->
+                    pomodoroViewModel.changeMode(prefs, newMode)
+                },
+                onPhaseIconClick = onPhaseIconClick
             )
         }
     }
 }
 
+// Pantalla en vertical
+@Composable
+private fun PomodoroPortraitLayout(
+    padding: PaddingValues,
+    mode: PomodoroMode,
+    phase: PomodoroPhase,
+    phaseColor: Color,
+    phaseIcon: ImageVector,
+    cycleCount: Int,
+    progress: Float,
+    timeText: String,
+    isRunning: Boolean,
+    onStart: () -> Unit,
+    onPause: () -> Unit,
+    onResetTimer: () -> Unit,
+    onResetCycles: () -> Unit,
+    onModeChange: (PomodoroMode) -> Unit,
+    onPhaseIconClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .padding(padding)
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+
+        // Icono de fase centrado
+        Icon(
+            imageVector = phaseIcon,
+            contentDescription = null,
+            tint = phaseColor,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentWidth(Alignment.CenterHorizontally)
+                .size(60.dp)
+                .let { base ->
+                    if (mode == PomodoroMode.POMODORO) {
+                        base.clickable { onPhaseIconClick() }
+                    } else {
+                        base
+                    }
+                }
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        // Cambio de modo
+        PomodoroModeSelector(
+            selected = mode,
+            onChange = onModeChange
+        )
+
+        Spacer(Modifier.height(20.dp))
+
+        // Texto fase / ciclos en modo completo
+        if (mode == PomodoroMode.POMODORO) {
+            val phaseText = when (phase) {
+                PomodoroPhase.FOCUS -> stringResource(R.string.pomodoro_phase_focus)
+                PomodoroPhase.SHORT_BREAK -> stringResource(R.string.pomodoro_phase_short_break)
+                PomodoroPhase.LONG_BREAK -> stringResource(R.string.pomodoro_phase_long_break)
+            }
+
+            Text(
+                phaseText,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp, bottom = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    stringResource(R.string.pomodoro_cycle_label, cycleCount),
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                OutlinedButton(
+                    onClick = onResetCycles
+                ) {
+                    Text(
+                        text = stringResource(R.string.pomodoro_reset_cycles),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+        } else {
+            Text(
+                stringResource(R.string.pomodoro_simple_mode_title),
+                style = MaterialTheme.typography.titleMedium
+            )
+            Spacer(Modifier.height(16.dp))
+        }
+
+        // Temporizador
+        CircularTimer(
+            progress = progress,
+            timeText = timeText,
+            ringColor = phaseColor,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+
+        Spacer(Modifier.height(30.dp))
+
+        // Controles
+        PomodoroControls(
+            isRunning = isRunning,
+            onStart = onStart,
+            onPause = onPause,
+            onReset = onResetTimer
+        )
+    }
+}
+
+// Para pantalla en horizontal
+@Composable
+private fun PomodoroLandscapeLayout(
+    padding: PaddingValues,
+    mode: PomodoroMode,
+    phase: PomodoroPhase,
+    phaseColor: Color,
+    phaseIcon: ImageVector,
+    cycleCount: Int,
+    progress: Float,
+    timeText: String,
+    isRunning: Boolean,
+    onStart: () -> Unit,
+    onPause: () -> Unit,
+    onResetTimer: () -> Unit,
+    onResetCycles: () -> Unit,
+    onModeChange: (PomodoroMode) -> Unit,
+    onPhaseIconClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .padding(padding)
+            .fillMaxSize()
+            .padding(12.dp)
+    ) {
+
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Icon(
+                imageVector = phaseIcon,
+                contentDescription = null,
+                tint = phaseColor,
+                modifier = Modifier
+                    .size(64.dp)
+                    .let { base ->
+                        if (mode == PomodoroMode.POMODORO) {
+                            base.clickable { onPhaseIconClick() }
+                        } else base
+                    }
+            )
+
+            PomodoroModeSelector(
+                selected = mode,
+                onChange = onModeChange
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            // IZQUIERDA: Fase + ciclos + reset
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                if (mode == PomodoroMode.POMODORO) {
+                    val phaseText = when (phase) {
+                        PomodoroPhase.FOCUS -> stringResource(R.string.pomodoro_phase_focus)
+                        PomodoroPhase.SHORT_BREAK -> stringResource(R.string.pomodoro_phase_short_break)
+                        PomodoroPhase.LONG_BREAK -> stringResource(R.string.pomodoro_phase_long_break)
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    Text(
+                        phaseText,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(Modifier.height(12.dp))
+
+                    Text(
+                        text = stringResource(R.string.pomodoro_cycle_label, cycleCount),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    OutlinedButton(
+                        onClick = onResetCycles
+                    ) {
+                        Text(text = stringResource(R.string.pomodoro_reset_cycles))
+                    }
+                } else {
+                    Text(
+                        stringResource(R.string.pomodoro_simple_mode_title),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+            }
+
+            // CENTRO: Reloj
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularTimer(
+                    progress = progress,
+                    timeText = timeText,
+                    ringColor = phaseColor,
+                    modifier = Modifier
+                        .fillMaxWidth(0.7f)
+                        .aspectRatio(1f)
+                )
+            }
+
+            // DERECHA: Controles
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 8.dp)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                PomodoroControls(
+                    isRunning = isRunning,
+                    onStart = onStart,
+                    onPause = onPause,
+                    onReset = onResetTimer
+                )
+            }
+        }
+    }
+}
+
+
+// Selector de temporizador
 @Composable
 fun PomodoroModeSelector(
     selected: PomodoroMode,
@@ -346,7 +571,7 @@ fun PomodoroModeSelector(
         )
 
         ModeButton(
-            text =  stringResource(R.string.pomodoro_mode_full),
+            text = stringResource(R.string.pomodoro_mode_full),
             selected = selected == PomodoroMode.POMODORO,
             onClick = { onChange(PomodoroMode.POMODORO) },
             modifier = Modifier.weight(1f)
@@ -377,6 +602,8 @@ private fun ModeButton(
     }
 }
 
+
+// Controles
 @Composable
 fun PomodoroControls(
     isRunning: Boolean,
@@ -388,7 +615,6 @@ fun PomodoroControls(
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier.fillMaxWidth()
     ) {
-
         // Iniciar / Pausar
         Text(
             text = if (isRunning)
