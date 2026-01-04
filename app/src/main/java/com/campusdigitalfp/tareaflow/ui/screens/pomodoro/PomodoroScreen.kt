@@ -41,12 +41,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.campusdigitalfp.tareaflow.viewmodel.PomodoroViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.PreferencesViewModel
-import kotlinx.coroutines.*
 import com.campusdigitalfp.tareaflow.R
-import kotlin.compareTo
-import kotlin.div
-import kotlin.rem
-import kotlin.text.toFloat
+import android.media.MediaPlayer
+import androidx.compose.ui.platform.LocalContext
 
 enum class PomodoroMode { SIMPLE, POMODORO }
 
@@ -198,9 +195,25 @@ fun PomodoroScreen(
         )
     }
 
+    // Para la reproducción de sonidos en los cambios de fase
+    val context = LocalContext.current
+
+    fun playSound(resId: Int) {
+        MediaPlayer.create(context, resId)?.apply {
+            setOnCompletionListener { release() }
+            start()
+        }
+    }
+
     // Helper para fin de fase
     fun handlePhaseFinish() {
         if (pomodoroViewModel.mode == PomodoroMode.POMODORO) {
+            // Determinar qué sonido reproducir según la fase que TERMINA
+            when (phase) {
+                PomodoroPhase.FOCUS -> playSound(R.raw.focus_end)
+                PomodoroPhase.SHORT_BREAK -> playSound(R.raw.short_break_end)
+                PomodoroPhase.LONG_BREAK -> playSound(R.raw.long_break_end)
+            }
             pomodoroViewModel.goToNextPhase(prefs)
 
             if (prefs.autoStartNextPhase) {
