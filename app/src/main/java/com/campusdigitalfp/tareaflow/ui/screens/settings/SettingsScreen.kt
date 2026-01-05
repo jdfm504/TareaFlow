@@ -31,6 +31,7 @@ import com.campusdigitalfp.tareaflow.viewmodel.PreferencesViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.UserProfileViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import com.google.firebase.auth.FirebaseAuth
+import kotlin.text.clear
 
 @Composable
 fun SettingsScreen(
@@ -532,22 +533,26 @@ fun SettingsScreen(
                                 context.getString(messageRes!!),
                                 Toast.LENGTH_LONG
                             ).show()
-                        } else {
-                            Toast.makeText(
-                                context,
-                                R.string.account_deleted,
-                                Toast.LENGTH_LONG
-                            ).show()
 
-                            FirebaseAuth.getInstance().signOut()
-                            profileViewModel.clear()
-                            prefsViewModel.clear()
+                            return@deleteAccount
+                        }
 
-                            navController.safeNavigate("onboarding") {
-                                popUpTo(0)
-                            }
+                        Toast.makeText(
+                            context,
+                            R.string.account_deleted,
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                        FirebaseAuth.getInstance().signOut()
+
+                        profileViewModel.clear()
+                        prefsViewModel.clear()
+
+                        navController.safeNavigate("onboarding") {
+                            popUpTo(0)
                         }
                     }
+
                 }) {
                     Text(
                         text = stringResource(R.string.dialog_yes_delete),

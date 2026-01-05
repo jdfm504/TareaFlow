@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import com.campusdigitalfp.tareaflow.R
 import com.campusdigitalfp.tareaflow.data.UserProfileRepository
 import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -228,29 +229,43 @@ class AuthViewModel(
 
         viewModelScope.launch {
             try {
-                // Borrar datos en Firestore para el usuario
                 val uid = user.uid
-                // Si el usuario es anónimo no hay usuario que borrar
+
+                // Si es anónimo no necesita reautenticación
                 if (user.isAnonymous) {
-                    // Solo borrar los datos de Firestore
                     deleteUserData(uid)
-                    // devolver éxito
+                    user.delete().await()
                     onResult(true, null)
                     return@launch
                 }
 
-                // Usuario registrado
+                // Para usuarios registrados
+                try {
+                    user.delete().await()   // puede fallar por falta de reauth
+                } catch (e: Exception) {
+
+                    // DETECCIÓN REAL DE ERROR DE REAUTENTICACIÓN
+                    val msg = e.message?.lowercase().orEmpty()
+
+                    if (
+                        "requires recent login" in msg ||
+                        "recent authentication" in msg ||
+                        e is FirebaseAuthRecentLoginRequiredException
+                    ) {
+                        onResult(false, R.string.error_reauth_required)
+                        return@launch
+                    }
+
+                    throw e // otros errores
+                }
+
+                // Si delete ha funcionado borrar datos
                 deleteUserData(uid)
-                user.delete().await()
+
                 onResult(true, null)
 
             } catch (e: Exception) {
-                val msg = if ("recent authentication" in (e.message ?: "")) {
-                    R.string.error_reauth_required
-                } else {
-                    R.string.error_unknown
-                }
-                onResult(false, msg)
+                onResult(false, R.string.error_unknown)
             }
         }
     }

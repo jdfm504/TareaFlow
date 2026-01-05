@@ -170,7 +170,6 @@ fun PomodoroScreen(
         )
     }
 
-
     if (showExitDialog) {
         AlertDialog(
             onDismissRequest = { showExitDialog = false },
@@ -326,10 +325,19 @@ private fun PomodoroPortraitLayout(
     onModeChange: (PomodoroMode) -> Unit,
     onPhaseIconClick: () -> Unit
 ) {
+    val screenHeight = LocalConfiguration.current.screenHeightDp
+
+    val timerSize = when {
+        screenHeight < 600 -> 220.dp     // pantallas pequeñas
+        screenHeight < 750 -> 260.dp     // medianas
+        else -> 320.dp                   // grandes
+    }
+
     Column(
         modifier = Modifier
             .padding(padding)
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
 
@@ -411,7 +419,9 @@ private fun PomodoroPortraitLayout(
             progress = progress,
             timeText = timeText,
             ringColor = phaseColor,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier
+                .size(timerSize)
+                .align(Alignment.CenterHorizontally)
         )
 
         Spacer(Modifier.height(30.dp))
@@ -449,6 +459,7 @@ private fun PomodoroLandscapeLayout(
         modifier = Modifier
             .padding(padding)
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(12.dp)
     ) {
 
@@ -487,6 +498,13 @@ private fun PomodoroLandscapeLayout(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val screenHeight = LocalConfiguration.current.screenHeightDp
+
+            val timerSize = when {
+                screenHeight < 600 -> 220.dp     // pantallas pequeñas
+                screenHeight < 750 -> 260.dp     // medianas
+                else -> 320.dp                   // grandes
+            }
 
             // IZQUIERDA: Fase + ciclos + reset
             Column(
@@ -546,8 +564,8 @@ private fun PomodoroLandscapeLayout(
                     timeText = timeText,
                     ringColor = phaseColor,
                     modifier = Modifier
-                        .fillMaxWidth(0.7f)
-                        .aspectRatio(1f)
+                        .size(timerSize)
+                        .align(Alignment.Center)
                 )
             }
 
