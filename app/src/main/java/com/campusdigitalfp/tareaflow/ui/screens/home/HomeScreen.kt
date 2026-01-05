@@ -43,6 +43,7 @@ import com.campusdigitalfp.tareaflow.R
 import kotlinx.coroutines.launch
 import com.campusdigitalfp.tareaflow.ui.theme.GreenDark
 import com.campusdigitalfp.tareaflow.data.model.Task
+import com.campusdigitalfp.tareaflow.ui.navigation.safeNavigate
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.UserProfileViewModel
 import kotlinx.coroutines.tasks.await
@@ -199,7 +200,7 @@ fun HomeScreen(
 
         // Si algo provoca que Home se monta sin usuario forzar salida
         if (user == null) {
-            navController.navigate("login") {
+            navController.safeNavigate("login") {
                 popUpTo(0) { inclusive = true }
             }
             return@LaunchedEffect
@@ -218,7 +219,7 @@ fun HomeScreen(
                 Toast.LENGTH_LONG
             ).show()
 
-            navController.navigate("login") {
+            navController.safeNavigate("login") {
                 popUpTo(0) { inclusive = true }
             }
         }
@@ -301,7 +302,7 @@ fun HomeScreen(
                                 text = { Text(stringResource(R.string.menu_add_task)) },
                                 onClick = {
                                     menuExpanded = false
-                                    navController.navigate("task/new")
+                                    navController.safeNavigate("task/new")
                                 }
                             )
 
@@ -317,7 +318,7 @@ fun HomeScreen(
                                     text = { Text(stringResource(R.string.menu_upgrade_account)) },
                                     onClick = {
                                         menuExpanded = false
-                                        navController.navigate("register")
+                                        navController.safeNavigate("register")
                                     }
                                 )
                             }
@@ -329,7 +330,7 @@ fun HomeScreen(
                                 text = { Text(stringResource(R.string.menu_settings)) },
                                 onClick = {
                                     menuExpanded = false
-                                    navController.navigate("settings")
+                                    navController.safeNavigate("settings")
                                 }
                             )
 
@@ -340,7 +341,7 @@ fun HomeScreen(
                                 text = { Text(stringResource(R.string.menu_pomodoro)) },
                                 onClick = {
                                     menuExpanded = false
-                                    navController.navigate("pomodoro")
+                                    navController.safeNavigate("pomodoro")
                                 }
                             )
 
@@ -351,7 +352,7 @@ fun HomeScreen(
                                 text = { Text(stringResource(R.string.menu_about)) },
                                 onClick = {
                                     menuExpanded = false
-                                    navController.navigate("about")
+                                    navController.safeNavigate("about")
                                 }
                             )
                             DropdownMenuItem(
@@ -373,7 +374,7 @@ fun HomeScreen(
                                         R.string.logout_success,
                                         Toast.LENGTH_SHORT
                                     ).show()
-                                    navController.navigate("login") {
+                                    navController.safeNavigate("login"){
                                         popUpTo("home") { inclusive = true }
                                     }
                                 }
@@ -387,7 +388,7 @@ fun HomeScreen(
         floatingActionButton = {
             if (!viewModel.isActionMode) {
                 FloatingActionButton(
-                    onClick = { navController.navigate("task/new") },
+                    onClick = { navController.safeNavigate("task/new") },
                     containerColor = fabColor
                 ) {
                     Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.fab_add_cd))
@@ -415,7 +416,7 @@ fun HomeScreen(
                     onToggle = { viewModel.togglePending() },
                     isActionMode = viewModel.isActionMode,
                     isSelected = { id -> viewModel.selected.contains(id) },
-                    onRowClick = { task -> navController.navigate("task/${task.id}") },
+                    onRowClick = { task -> navController.safeNavigate("task/${task.id}") },
                     onRowLongClick = { task -> viewModel.toggleSelection(task.id) },
                     onToggleDone = { task -> viewModel.toggleDone(task.id) }
                 )
@@ -433,7 +434,7 @@ fun HomeScreen(
                    onToggle = { viewModel.toggleCompleted() },
                     isActionMode = viewModel.isActionMode,
                     isSelected = { id -> viewModel.selected.contains(id) },
-                    onRowClick = { task -> navController.navigate("task/${task.id}") },
+                    onRowClick = { task -> navController.safeNavigate("task/${task.id}") },
                     onRowLongClick = { task -> viewModel.toggleSelection(task.id) },
                     onToggleDone = { task -> viewModel.toggleDone(task.id) }
                 )

@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.campusdigitalfp.tareaflow.data.PreferencesRepository
 import com.campusdigitalfp.tareaflow.data.model.UserPreferences
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -19,7 +18,6 @@ class PreferencesViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
-
             val auth = FirebaseAuth.getInstance()
             val user = auth.currentUser
 

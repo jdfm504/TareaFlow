@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.campusdigitalfp.tareaflow.ui.navigation.ProtectedRoute
+import com.campusdigitalfp.tareaflow.ui.navigation.safeNavigate
 import com.campusdigitalfp.tareaflow.ui.screens.about.AboutScreen
 import com.campusdigitalfp.tareaflow.ui.screens.home.HomeScreen
 import com.campusdigitalfp.tareaflow.ui.screens.register.RegisterScreen
@@ -23,12 +24,11 @@ import com.campusdigitalfp.tareaflow.viewmodel.UserProfileViewModel
 @Composable
 fun TareaFlowNavHost(
     navController: NavHostController,
-    taskViewModel: TaskViewModel = viewModel(),
     authViewModel: AuthViewModel = viewModel(),
-    profileViewModel: UserProfileViewModel
+    profileViewModel: UserProfileViewModel,
+    prefsViewModel: PreferencesViewModel
 ) {
     val auth = FirebaseAuth.getInstance()
-    val prefsViewModel: PreferencesViewModel = viewModel()
 
     // Validar usuario al arrancar la app
     LaunchedEffect(Unit) {
@@ -55,24 +55,22 @@ fun TareaFlowNavHost(
         // ============ ONBOARDING ============
         composable("onboarding") {
             OnboardingScreen(
-                onStart = { navController.navigate("register") },
-                onGoToLogin = { navController.navigate("login") }
+                onStart = { navController.safeNavigate("register") },
+                onGoToLogin = { navController.safeNavigate("login") }
             )
         }
 
         // ============ LOGIN ============
         composable("login") {
-            val prefsViewModel: PreferencesViewModel = viewModel()
-
             LoginScreen(
                 onLoginSuccess = {
                     profileViewModel.reload()
                     prefsViewModel.reload()
-                    navController.navigate("home") {
+                    navController.safeNavigate("home") {
                         popUpTo(0) { inclusive = true }
                     }
                 },
-                onGoToRegister = { navController.navigate("register") }
+                onGoToRegister = { navController.safeNavigate("register") }
             )
         }
 
@@ -82,11 +80,11 @@ fun TareaFlowNavHost(
                 onRegisterSuccess = {
                     profileViewModel.reload()
                     prefsViewModel.reload()
-                    navController.navigate("home") {
+                    navController.safeNavigate("home") {
                         popUpTo(0) { inclusive = true }
                     }
                 },
-                onGoToLogin = { navController.popBackStack() }
+                onGoToLogin = { navController.safeNavigate("login") }
             )
         }
 
@@ -107,22 +105,14 @@ fun TareaFlowNavHost(
         // ============ NUEVA TAREA ============
         composable("task/new") {
             val taskViewModel: TaskViewModel = viewModel()
-
-            TaskEditScreen(
-                navController = navController,
-                viewModel = taskViewModel
-            )
+            TaskEditScreen(navController, taskViewModel)
         }
 
         // ============ EDITAR TAREA ============
         composable("task/{taskId}") { backStackEntry ->
             val taskViewModel: TaskViewModel = viewModel()
             val taskId = backStackEntry.arguments?.getString("taskId")
-
-            TaskEditScreen(
-                navController = navController,
-                viewModel = taskViewModel,
-                taskId = taskId)
+            TaskEditScreen(navController, taskViewModel, taskId)
         }
 
         // ============ ABOUT ============
@@ -134,16 +124,14 @@ fun TareaFlowNavHost(
         composable("settings") {
             SettingsScreen(
                 navController = navController,
-                profileViewModel = profileViewModel
+                profileViewModel = profileViewModel,
+                prefsViewModel = prefsViewModel
             )
         }
 
         // ============ POMODORO ============
         composable("pomodoro") {
-            PomodoroScreen(
-                navController = navController,
-                prefsViewModel = prefsViewModel
-            )
+            PomodoroScreen(navController = navController, prefsViewModel = prefsViewModel)
         }
     }
 }

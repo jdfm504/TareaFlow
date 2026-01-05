@@ -4,6 +4,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.campusdigitalfp.tareaflow.data.model.UserPreferences
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -53,49 +54,67 @@ class PreferencesRepository {
     // INICIAL
     // ---------------------------
     suspend fun ensureDocumentExists() {
-        val doc = preferencesDocument() ?: return
+        val doc = preferencesDocument()
         val snapshot = doc.get().await()
+
         if (!snapshot.exists()) {
-            doc.set(UserPreferences()).await()
+            doc.set(UserPreferences(), SetOptions.merge()).await()
+            return
         }
+
+        // Fusionar campos por si faltan (por ejemplo darkTheme)
+        val existing = snapshot.toObject(UserPreferences::class.java) ?: UserPreferences()
+        doc.set(existing, SetOptions.merge()).await()
     }
 
     // ---------------------------
     // UPDATE
     // ---------------------------
     suspend fun updateDarkTheme(value: Boolean) {
-        preferencesDocument()?.update("darkTheme", value)?.await()
-    }
-
-    suspend fun updateLanguage(lang: String) {
-        preferencesDocument()?.update("language", lang)?.await()
+        preferencesDocument()
+            .set(mapOf("darkTheme" to value), SetOptions.merge())
+            .await()
     }
 
     suspend fun updatePomodoro(minutes: Int) {
-        preferencesDocument().update("pomodoroMinutes", minutes).await()
+        preferencesDocument()
+            .set(mapOf("pomodoroMinutes" to minutes), SetOptions.merge())
+            .await()
     }
 
     suspend fun updateShortBreak(value: Int) {
-        preferencesDocument().update("shortBreakMinutes", value).await()
+        preferencesDocument()
+            .set(mapOf("shortBreakMinutes" to value), SetOptions.merge())
+            .await()
     }
 
     suspend fun updateLongBreak(value: Int) {
-        preferencesDocument().update("longBreakMinutes", value).await()
+        preferencesDocument()
+            .set(mapOf("longBreakMinutes" to value), SetOptions.merge())
+            .await()
     }
 
     suspend fun updateCycles(value: Int) {
-        preferencesDocument().update("cyclesUntilLongBreak", value).await()
+        preferencesDocument()
+            .set(mapOf("cyclesUntilLongBreak" to value), SetOptions.merge())
+            .await()
     }
 
     suspend fun updateAutoStart(value: Boolean) {
-        preferencesDocument()?.update("autoStartNextPhase", value)?.await()
+        preferencesDocument()
+            .set(mapOf("autoStartNextPhase" to value), SetOptions.merge())
+            .await()
     }
 
     suspend fun updatePhaseTipShown() {
-        preferencesDocument()?.update("phaseTipShown", true)?.await()
+        preferencesDocument()
+            .set(mapOf("phaseTipShown" to true), SetOptions.merge())
+            .await()
     }
 
     suspend fun updateSoundEnabled(value: Boolean) {
-        preferencesDocument()?.update("soundEnabled", value)?.await()
+        preferencesDocument()
+            .set(mapOf("soundEnabled" to value), SetOptions.merge())
+            .await()
     }
 }

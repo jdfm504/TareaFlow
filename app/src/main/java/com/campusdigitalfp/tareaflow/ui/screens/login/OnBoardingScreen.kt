@@ -31,9 +31,30 @@ fun OnboardingScreen(
     onStart: () -> Unit,
     onGoToLogin: () -> Unit
 ) {
-    val heroFraction = 0.7f // controla la altura de la zona verde
-    val config = LocalConfiguration.current
-    val screenH = config.screenHeightDp.dp
+    val conf = LocalConfiguration.current
+    val screenHeight = conf.screenHeightDp.dp
+    val screenWidth = conf.screenWidthDp.dp
+
+    // Altura de la zona verde según altura de pantalla
+    val heroHeight = when {
+        screenHeight < 600.dp -> screenHeight * 0.62f
+        screenHeight < 750.dp -> screenHeight * 0.67f
+        else -> screenHeight * 0.72f
+    }
+
+    // Icono segun tamaño de pantalla
+    val iconSize = when {
+        screenWidth < 350.dp -> 90.dp
+        screenWidth < 400.dp -> 120.dp
+        else -> 150.dp
+    }
+
+    // Tamaño del título según pantalla
+    val titleSize = when {
+        screenWidth < 350.dp -> 28.sp
+        screenWidth < 400.dp -> 32.sp
+        else -> 38.sp
+    }
 
     ApplyStatusBarTheme()
 
@@ -42,106 +63,124 @@ fun OnboardingScreen(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // ZONA VERDE
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(heroFraction)
-                .clip(RoundedCornerShape(bottomStart = 50.dp, bottomEnd = 50.dp))
-                .background(brush = Brush.verticalGradient(listOf(GreenPrimary, GreenLight)))
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
+
+            // Zona verde
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(heroHeight)
+                    .clip(RoundedCornerShape(bottomStart = 40.dp, bottomEnd = 40.dp))
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(GreenPrimary, GreenLight)
+                        )
+                    )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 24.dp)
+                        .padding(
+                            top = when {
+                                screenHeight < 600.dp -> 80.dp   // móviles pequeños
+                                screenHeight < 750.dp -> 120.dp   // medianos
+                                else -> 140.dp                    // grandes
+                            },
+                            bottom = 80.dp
+                        ),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    // titulo
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(iconSize)
+                        )
+
+                        Spacer(Modifier.height(12.dp))
+
+                        Text(
+                            text = stringResource(R.string.app_name),
+                            color = Color.White,
+                            fontSize = titleSize,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    // subitutlo
+                    Text(
+                        text = stringResource(R.string.onboarding_subtitle),
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        fontSize = 16.sp,
+                        lineHeight = 20.sp,
+                        modifier = Modifier.widthIn(max = 300.dp)
+                    )
+                }
+            }
+
+            //  botón
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(72.dp),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                Surface(
+                    shape = CircleShape,
+                    color = GreenPrimary,
+                    shadowElevation = 10.dp,
+                    onClick = onStart,
+                    modifier = Modifier
+                        .size(72.dp)
+                        .offset(y = (-36).dp) // la mitad hacia arriba para solaparse con el borde negro
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+                }
+            }
+
+            // zona blanca
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 32.dp)
-                    .padding(top = 80.dp, bottom = 180.dp),
-                verticalArrangement = Arrangement.Bottom,
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Bottom
             ) {
-                // Parte superior zona verde
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier
-                            .size(150.dp)
-                            .padding(top = 25.dp, bottom = 25.dp)
-                    )
-
-                    Spacer(Modifier.height(25.dp))
-
-                    Text(
-                        text = stringResource(R.string.app_name),
-                        color = Color.White,
-                        fontSize = 38.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 25.dp)
-                    )
-                }
-
-                // Subtítulo
                 Text(
-                    text = stringResource(R.string.onboarding_subtitle),
-                    color = Color.White,
-                    textAlign = TextAlign.Center,
-                    fontSize = 17.sp,
-                    lineHeight = 22.sp,
-                    modifier = Modifier.widthIn(max = 300.dp)
-                )
-            }
-        }
-
-        // BOTÓN CIRCULAR EN EL BORDE
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = screenH * heroFraction - 36.dp), // 36 = radio del círculo
-            contentAlignment = Alignment.TopCenter
-        ) {
-            Surface(
-                shape = CircleShape,
-                color = GreenPrimary,
-                shadowElevation = 10.dp,
-                onClick = onStart,
-                modifier = Modifier.size(72.dp)
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(30.dp)
-                    )
-                }
-            }
-        }
-
-        //  TEXTO ZONA BLANCA
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .padding(bottom = 100.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = stringResource(R.string.onboarding_button),
-                color = GreenPrimary,
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 35.dp)
-
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            TextButton(onClick = onGoToLogin) {
-                Text(
-                    text = stringResource(R.string.onboarding_login_link),
+                    text = stringResource(R.string.onboarding_button),
                     color = GreenPrimary,
-                    fontSize = 15.sp
+                    fontSize = if (screenWidth < 350.dp) 28.sp else 32.sp,
+                    fontWeight = FontWeight.Bold
                 )
+
+                Spacer(Modifier.height(12.dp))
+
+                TextButton(onClick = onGoToLogin) {
+                    Text(
+                        text = stringResource(R.string.onboarding_login_link),
+                        color = GreenPrimary,
+                        fontSize = 15.sp
+                    )
+                }
+
+                Spacer(Modifier.height(8.dp))
             }
         }
     }

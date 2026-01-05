@@ -4,13 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -27,19 +25,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.campusdigitalfp.tareaflow.R
+import com.campusdigitalfp.tareaflow.ui.navigation.safeNavigate
 import com.campusdigitalfp.tareaflow.ui.theme.ApplyStatusBarTheme
 import com.campusdigitalfp.tareaflow.viewmodel.PreferencesViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.UserProfileViewModel
 import com.campusdigitalfp.tareaflow.viewmodel.AuthViewModel
 import com.google.firebase.auth.FirebaseAuth
-import kotlin.text.clear
-import kotlin.toString
 
 @Composable
 fun SettingsScreen(
     navController: NavController,
     profileViewModel: UserProfileViewModel,
-    prefsViewModel: PreferencesViewModel = viewModel()
+    prefsViewModel: PreferencesViewModel
 ) {
     val prefs by prefsViewModel.prefs.collectAsState()
     val context = LocalContext.current
@@ -54,7 +51,6 @@ fun SettingsScreen(
     var repeatPassword by rememberSaveable { mutableStateOf("") }
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
 
-    val prefsState = prefsViewModel.prefs.collectAsState().value
     val prefsLoaded = prefsViewModel.isLoaded.collectAsState().value
 
     if (!prefsLoaded) {
@@ -74,10 +70,10 @@ fun SettingsScreen(
     var tempCycles by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-            tempPomodoro = prefsState.pomodoroMinutes.toString()
-            tempShortBreak = prefsState.shortBreakMinutes.toString()
-            tempLongBreak = prefsState.longBreakMinutes.toString()
-            tempCycles = prefsState.cyclesUntilLongBreak.toString()
+        tempPomodoro = prefs.pomodoroMinutes.toString()
+        tempShortBreak = prefs.shortBreakMinutes.toString()
+        tempLongBreak = prefs.longBreakMinutes.toString()
+        tempCycles = prefs.cyclesUntilLongBreak.toString()
     }
 
     var tempName by rememberSaveable { mutableStateOf("") }
@@ -144,7 +140,7 @@ fun SettingsScreen(
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier
                     .padding(top = 6.dp)
-                    .clickable { navController.navigate("register") },
+                    .clickable { navController.safeNavigate("register") },
                 fontWeight = FontWeight.SemiBold
             )
         }
@@ -547,7 +543,7 @@ fun SettingsScreen(
                             profileViewModel.clear()
                             prefsViewModel.clear()
 
-                            navController.navigate("onboarding") {
+                            navController.safeNavigate("onboarding") {
                                 popUpTo(0)
                             }
                         }

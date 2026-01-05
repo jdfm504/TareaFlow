@@ -77,22 +77,38 @@ fun AboutScreen(navController: NavController) {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 OutlinedButton(
-                    onClick = { abrirPaginaWeb("https://www.fpvirtualaragon.es", context) },
+                    onClick = {
+                        abrirPaginaWeb(
+                            "https://www.fpvirtualaragon.es",
+                            context
+                        )
+                    },
                     modifier = Modifier
                         .weight(1f)
-                        .height(56.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
+                        .defaultMinSize(minHeight = 56.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Public,
-                        contentDescription = null,
-                        modifier = Modifier.size(22.dp)
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    Text(stringResource(
-                        R.string.ir_al_sitio_web),
-                        fontSize = 16.sp
-                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Public,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+
+                        Spacer(Modifier.width(8.dp))
+
+                        Text(
+                            text = stringResource(R.string.ir_al_sitio_web),
+                            fontSize = 15.sp,
+                            textAlign = TextAlign.Center,
+                            maxLines = 2
+                        )
+                    }
                 }
 
                 Button(
@@ -105,38 +121,53 @@ fun AboutScreen(navController: NavController) {
                     },
                     modifier = Modifier
                         .weight(1f)
-                        .height(56.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
+                        .defaultMinSize(minHeight = 56.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Email,
-                        contentDescription = null,
-                        modifier = Modifier.size(22.dp)
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(stringResource(
-                        R.string.obtener_soporte),
-                        fontSize = 16.sp
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Email,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+
+                        Spacer(Modifier.width(8.dp))
+
+                        Text(
+                            text = stringResource(R.string.obtener_soporte),
+                            fontSize = 15.sp,
+                            textAlign = TextAlign.Center,
+                            maxLines = 2
+                        )
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Botón de volver
+            // botón para volver
             TextButton(
                 onClick = { navController.popBackStack() },
-                modifier = Modifier.height(48.dp)
+                modifier = Modifier
+                    .height(48.dp)
+                    .align(Alignment.CenterHorizontally)
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.primary
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    stringResource(R.string.volver),
-                    fontSize = 16.sp
+                    text = stringResource(R.string.volver),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }

@@ -17,13 +17,14 @@ import com.campusdigitalfp.tareaflow.viewmodel.UserProfileViewModel
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
-            // Cargar preferencias de Firestore
             val prefsViewModel: PreferencesViewModel = viewModel()
+            val profileViewModel: UserProfileViewModel = viewModel()
 
             val prefs by prefsViewModel.prefs.collectAsState()
             val isLoaded by prefsViewModel.isLoaded.collectAsState()
-            val profileViewModel: UserProfileViewModel = viewModel()
+            val navController = rememberNavController()
 
             // Mostrar pantalla de carga hasta tener las preferencias
             if (!isLoaded) {
@@ -33,10 +34,14 @@ class MainActivity : ComponentActivity() {
 
             // Aplicar tema visual desde Firestore
             TareaFlowTheme(darkTheme = prefs.darkTheme) {
-
                 Surface {
-                    val navController = rememberNavController()
-                    TareaFlowNavHost(navController, profileViewModel = profileViewModel)
+
+                    TareaFlowNavHost(
+                        navController = navController,
+                        authViewModel = viewModel(),
+                        profileViewModel = profileViewModel,
+                        prefsViewModel = prefsViewModel
+                    )
                 }
             }
         }
