@@ -44,6 +44,8 @@ import com.campusdigitalfp.tareaflow.viewmodel.PreferencesViewModel
 import com.campusdigitalfp.tareaflow.R
 import android.media.MediaPlayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalView
 
 enum class PomodoroMode { SIMPLE, POMODORO }
 
@@ -222,6 +224,16 @@ fun PomodoroScreen(
                     handlePhaseFinish()
                 }
             }
+        }
+    }
+
+    val view = LocalView.current
+
+    DisposableEffect(isRunning) {
+        view.keepScreenOn = isRunning
+
+        onDispose {
+            view.keepScreenOn = false
         }
     }
 
